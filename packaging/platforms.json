@@ -1,0 +1,67 @@
+{
+  "format": 1,
+  "distribution": "development-candidate",
+  "license": "GPL-3.0-only",
+  "platforms": [
+    {
+      "target": "windows-amd64",
+      "supported": false,
+      "nativeEvidenceVerified": true,
+      "cleanProfileVerified": false,
+      "minimumOS": null,
+      "tray": "native-local-tested",
+      "signing": "unsigned",
+      "notes": "Windows development-host binary, private control and native tray dispatch tested; human double-click/default-browser/clean profile not certified."
+    },
+    {
+      "target": "windows-arm64",
+      "supported": false,
+      "nativeEvidenceVerified": false,
+      "cleanProfileVerified": false,
+      "minimumOS": null,
+      "tray": "candidate-native",
+      "signing": "unsigned",
+      "notes": "No ARM64 device evidence."
+    },
+    {
+      "target": "linux-amd64",
+      "supported": false,
+      "nativeEvidenceVerified": false,
+      "cleanProfileVerified": false,
+      "minimumOS": null,
+      "tray": "headless-fallback",
+      "signing": "unsigned",
+      "notes": "Container core tests are not a desktop or clean-machine certification."
+    },
+    {
+      "target": "linux-arm64",
+      "supported": false,
+      "nativeEvidenceVerified": false,
+      "cleanProfileVerified": false,
+      "minimumOS": null,
+      "tray": "headless-fallback",
+      "signing": "unsigned",
+      "notes": "No ARM64 device evidence."
+    },
+    {
+      "target": "darwin-amd64",
+      "supported": false,
+      "nativeEvidenceVerified": false,
+      "cleanProfileVerified": false,
+      "minimumOS": null,
+      "tray": "headless-fallback",
+      "signing": "unsigned-not-notarized",
+      "notes": "No native macOS build/device certification."
+    },
+    {
+      "target": "darwin-arm64",
+      "supported": false,
+      "nativeEvidenceVerified": false,
+      "cleanProfileVerified": false,
+      "minimumOS": null,
+      "tray": "headless-fallback",
+      "signing": "unsigned-not-notarized",
+      "notes": "No native macOS build/device certification."
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+CREATE TABLE work_requests(id TEXT PRIMARY KEY,project_id TEXT NOT NULL REFERENCES projects(id),version INTEGER NOT NULL CHECK(version>0),state TEXT NOT NULL CHECK(state IN('waiting','preparing','converted','cancelled')),preparer_participant_id TEXT REFERENCES participants(id),preparer_session_id TEXT REFERENCES sessions(id),preparation_epoch INTEGER NOT NULL DEFAULT 0,task_id TEXT UNIQUE REFERENCES tasks(id),body TEXT NOT NULL CHECK(json_valid(body)),CHECK((preparer_participant_id IS NULL)=(preparer_session_id IS NULL)));
+CREATE INDEX requests_project ON work_requests(project_id,id);
+CREATE TABLE decision_requests_new(id TEXT PRIMARY KEY,project_id TEXT NOT NULL REFERENCES projects(id),task_id TEXT REFERENCES tasks(id),version INTEGER NOT NULL,scope_key TEXT NOT NULL,state TEXT NOT NULL,body TEXT NOT NULL CHECK(json_valid(body)),request_id TEXT REFERENCES work_requests(id),CHECK((task_id IS NULL)!=(request_id IS NULL)));
+INSERT INTO decision_requests_new(id,project_id,task_id,version,scope_key,state,body) SELECT id,project_id,task_id,version,scope_key,state,body FROM decision_requests;
+DROP TABLE decision_requests;
+ALTER TABLE decision_requests_new RENAME TO decision_requests;
+CREATE UNIQUE INDEX one_pending_question ON decision_requests(task_id,scope_key) WHERE state='pending' AND task_id IS NOT NULL;
+CREATE UNIQUE INDEX one_pending_request_question ON decision_requests(request_id,scope_key) WHERE state='pending' AND request_id IS NOT NULL;
+CREATE TABLE external_jobs_new(id TEXT PRIMARY KEY,binding_id TEXT NOT NULL REFERENCES bindings(id),task_id TEXT REFERENCES tasks(id),version INTEGER NOT NULL,kind TEXT NOT NULL,status TEXT NOT NULL,dedupe_key TEXT NOT NULL UNIQUE,retry_at TEXT,body TEXT NOT NULL CHECK(json_valid(body)),request_id TEXT REFERENCES work_requests(id),CHECK((task_id IS NULL)!=(request_id IS NULL)));
+INSERT INTO external_jobs_new(id,binding_id,task_id,version,kind,status,dedupe_key,retry_at,body) SELECT id,binding_id,task_id,version,kind,status,dedupe_key,retry_at,body FROM external_jobs;
+DROP TABLE external_jobs;
+ALTER TABLE external_jobs_new RENAME TO external_jobs;
+PRAGMA user_version=2;

@@ -1,0 +1,15 @@
+{
+ "context": {
+  "protocolVersion":1,
+  "projectId":"synthetic-project",
+  "serviceUrlRef":"product-private discovery.json",
+  "profileRef":"product-private clients / explicit conversation handle",
+  "skillRef":".agents/skills/roooooom/SKILL.md",
+  "ownerApprovalRef":"synthetic explicit adoption instruction"
+ },
+ "before":"# Synthetic project guide\n\nPreserve this authority and its spacing.\n",
+ "after":"\n## Neighbour instructions\n\nKeep this exact text.\n",
+ "wrongCommand":"roooooom teleport --profile fixture --json",
+ "secretSentinel":"ROOOOOOM_TEST_SECRET_SENTINEL_do_not_ship",
+ "unicode":"# 合成專案\n保留：空白、路徑與原本換行。\n"
+}

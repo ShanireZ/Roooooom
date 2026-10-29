@@ -1,0 +1,4662 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Roooooom Local Coordination API",
+    "version": "0.1.0-dev",
+    "description": "Authoritative JSON-compatible YAML contract. Source-owned constraints and evidence references never prove Git or tests were executed by this service."
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:7337"
+    }
+  ],
+  "paths": {
+    "/api/v1/setup/activate": {
+      "post": {
+        "operationId": "activateOwner",
+        "description": "One-time five-minute private file form. Only this route accepts Origin null.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "capability"
+                ],
+                "properties": {
+                  "capability": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "303": {
+            "description": "Owner HttpOnly SameSite Strict cookie; redirect to setup"
+          },
+          "409": {
+            "description": "Expired or consumed capability"
+          }
+        }
+      }
+    },
+    "/api/v1/me": {
+      "get": {
+        "operationId": "currentActor",
+        "security": [
+          {
+            "AgentBearer": []
+          },
+          {
+            "OwnerCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authenticated actor; CSRF returned only to same-origin owner cookie session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/enroll": {
+      "post": {
+        "operationId": "enrollAgent",
+        "security": [
+          {
+            "AgentBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Enrollment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Credentials in result; caller stores privately",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Structured error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/commands/{kind}": {
+      "post": {
+        "operationId": "applyCommand",
+        "description": "Owner configuration requires owner cookie, exact Origin and X-CSRF-Token. Body actor fields are forbidden.",
+        "security": [
+          {
+            "AgentBearer": []
+          },
+          {
+            "OwnerCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "project.create",
+                "enrollment.enable",
+                "participant.revoke",
+                "task.create",
+                "integrator.claim",
+                "assignment.create",
+                "assignment.claim",
+                "assignment.release",
+                "assignment.update",
+                "collaborator.limit",
+                "task.reopen",
+                "task.cancel",
+                "session.checkpoint",
+                "session.end",
+                "session.resume",
+                "integrator.handoff",
+                "message.send",
+                "receipt.update",
+                "decision.request",
+                "decision.resolve",
+                "decision.supersede",
+                "decision.withdraw",
+                "decision.followup",
+                "delivery.submit",
+                "delivery.review",
+                "integration.record",
+                "acceptance.policy",
+                "acceptance.candidate",
+                "acceptance.accept",
+                "task.complete",
+                "offline.reconcile",
+                "offline.resolve",
+                "backup.create",
+                "backup.export",
+                "participant.recover",
+                "binding.create",
+                "binding.disable",
+                "binding.retry",
+                "binding.credential",
+                "binding.rotate",
+                "request.create",
+                "request.claim",
+                "request.release",
+                "request.handoff",
+                "request.accept",
+                "request.resume",
+                "request.assign",
+                "request.cancel",
+                "request.convert",
+                "binding.inspect"
+              ]
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-CSRF-Token",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Mutation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Atomic committed receipt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Structured error; 400 invalid, 401 unauthenticated, 403 forbidden, 409 stale, 413 body budget",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "description": "Minimal service identity; no tasks or credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Identity"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/queries/{kind}": {
+      "get": {
+        "operationId": "readWorkspace",
+        "security": [
+          {
+            "AgentBearer": []
+          },
+          {
+            "OwnerCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "projects",
+                "tasks",
+                "task",
+                "assignments",
+                "assignment",
+                "sessions",
+                "attention",
+                "inbox",
+                "thread",
+                "message",
+                "decisions",
+                "decision",
+                "deliveries",
+                "delivery",
+                "integrations",
+                "candidate",
+                "acceptances",
+                "completions",
+                "offline-candidates",
+                "offline-candidate",
+                "metrics",
+                "participants",
+                "candidates",
+                "bindings",
+                "outbound-jobs",
+                "requests",
+                "request"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "projectId",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "targetId",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Scoped read snapshot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Structured error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sessions": {
+      "post": {
+        "operationId": "createWorkSession",
+        "description": "Creates a fresh session for the same participant and project; transfers no responsibilities.",
+        "security": [
+          {
+            "AgentBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "serviceId",
+                  "datasetGeneration",
+                  "clientRequestId"
+                ],
+                "properties": {
+                  "serviceId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "datasetGeneration": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "clientRequestId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Credentials in result; store privately",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Structured error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/identity": {
+      "get": {
+        "operationId": "identity",
+        "responses": {
+          "200": {
+            "description": "Identity to compare before transmitting client credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Identity"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sync": {
+      "get": {
+        "operationId": "syncWorkspace",
+        "security": [
+          {
+            "AgentBearer": []
+          },
+          {
+            "OwnerCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string",
+              "maxLength": 4096
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Durable events; no automatic fetched/seen receipt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Structured error including cursor_reset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/wait": {
+      "get": {
+        "operationId": "waitWorkspace",
+        "security": [
+          {
+            "AgentBearer": []
+          },
+          {
+            "OwnerCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string",
+              "maxLength": 4096
+            }
+          },
+          {
+            "in": "query",
+            "name": "timeoutSeconds",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 60,
+              "default": 30
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Durable events; no automatic fetched/seen receipt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Structured error including cursor_reset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/events": {
+      "get": {
+        "operationId": "eventsWorkspace",
+        "security": [
+          {
+            "AgentBearer": []
+          },
+          {
+            "OwnerCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string",
+              "maxLength": 4096
+            }
+          },
+          {
+            "in": "header",
+            "name": "Last-Event-ID",
+            "schema": {
+              "type": "string",
+              "maxLength": 4096
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Durable events; no automatic fetched/seen receipt",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string",
+                  "description": "workspace events contain a SyncPage as JSON data; id is the signed cursor"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Structured error including cursor_reset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/control/probe": {
+      "post": {
+        "operationId": "ownServiceProbe",
+        "description": "Private native launcher control plane. Raw bounded response, outside agent commands/events; exact identity and installation checks. No vendor-host control.",
+        "security": [
+          {
+            "OwnerControl": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ControlIdentity"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Own product control result; no capability in the response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ControlProof"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Agent/owner-cookie/foreign-origin requests cannot use this capability"
+          },
+          "409": {
+            "description": "Service identity changed"
+          }
+        }
+      }
+    },
+    "/api/v1/control/activate": {
+      "post": {
+        "operationId": "ownServiceActivate",
+        "description": "Private native launcher control plane. Raw bounded response, outside agent commands/events; exact identity and installation checks. No vendor-host control.",
+        "security": [
+          {
+            "OwnerControl": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ControlIdentity"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Own product control result; no capability in the response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "activationPath": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Agent/owner-cookie/foreign-origin requests cannot use this capability"
+          },
+          "409": {
+            "description": "Service identity changed"
+          }
+        }
+      }
+    },
+    "/api/v1/control/stop": {
+      "post": {
+        "operationId": "ownServiceStop",
+        "description": "Private native launcher control plane. Raw bounded response, outside agent commands/events; exact identity and installation checks. No vendor-host control.",
+        "security": [
+          {
+            "OwnerControl": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ControlIdentity"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Own product control result; no capability in the response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "stopping": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Agent/owner-cookie/foreign-origin requests cannot use this capability"
+          },
+          "409": {
+            "description": "Service identity changed"
+          }
+        }
+      }
+    },
+    "/api/v1/setup/connection": {
+      "get": {
+        "operationId": "ownerConnectionInstructions",
+        "description": "Owner-only product paths for generated connection instructions. Never returns capability/token.",
+        "security": [
+          {
+            "OwnerCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Owner connection metadata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Agents forbidden"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "AgentBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      },
+      "OwnerCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "roooooom_owner"
+      },
+      "OwnerControl": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Ephemeral own-service control capability from the product-private control.json. Never an agent token or browser owner cookie."
+      }
+    },
+    "schemas": {
+      "Mutation": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "serviceId",
+          "datasetGeneration",
+          "clientRequestId",
+          "payload"
+        ],
+        "properties": {
+          "serviceId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "datasetGeneration": {
+            "type": "string",
+            "minLength": 1
+          },
+          "clientRequestId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "targetId": {
+            "type": "string"
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "claimEpoch": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "integratorEpoch": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "specVersion": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "acceptancePolicyVersion": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "sessionId": {
+            "type": "string"
+          },
+          "decisionVersions": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "payload": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProjectCreate"
+              },
+              {
+                "$ref": "#/components/schemas/Empty"
+              },
+              {
+                "$ref": "#/components/schemas/TaskCreate"
+              },
+              {
+                "$ref": "#/components/schemas/AssignmentCreate"
+              },
+              {
+                "$ref": "#/components/schemas/Release"
+              },
+              {
+                "$ref": "#/components/schemas/AssignmentUpdate"
+              },
+              {
+                "$ref": "#/components/schemas/Limit"
+              },
+              {
+                "$ref": "#/components/schemas/Reason"
+              },
+              {
+                "$ref": "#/components/schemas/Checkpoint"
+              },
+              {
+                "$ref": "#/components/schemas/Resume"
+              },
+              {
+                "$ref": "#/components/schemas/Handoff"
+              },
+              {
+                "$ref": "#/components/schemas/MessageSend"
+              },
+              {
+                "$ref": "#/components/schemas/ReceiptUpdate"
+              },
+              {
+                "$ref": "#/components/schemas/DecisionRequest"
+              },
+              {
+                "$ref": "#/components/schemas/DecisionResolve"
+              },
+              {
+                "$ref": "#/components/schemas/DecisionFollowup"
+              },
+              {
+                "$ref": "#/components/schemas/DeliverySubmit"
+              },
+              {
+                "$ref": "#/components/schemas/DeliveryReview"
+              },
+              {
+                "$ref": "#/components/schemas/IntegrationRecord"
+              },
+              {
+                "$ref": "#/components/schemas/AcceptancePolicyChange"
+              },
+              {
+                "$ref": "#/components/schemas/AcceptanceCandidate"
+              },
+              {
+                "$ref": "#/components/schemas/AcceptCandidate"
+              },
+              {
+                "$ref": "#/components/schemas/OfflineReconcile"
+              },
+              {
+                "$ref": "#/components/schemas/OfflineReview"
+              },
+              {
+                "$ref": "#/components/schemas/RequestCreate"
+              },
+              {
+                "$ref": "#/components/schemas/RequestHandoff"
+              },
+              {
+                "$ref": "#/components/schemas/RequestResume"
+              },
+              {
+                "$ref": "#/components/schemas/RequestAssign"
+              },
+              {
+                "$ref": "#/components/schemas/RequestConvert"
+              },
+              {
+                "$ref": "#/components/schemas/BindingCredential"
+              },
+              {
+                "$ref": "#/components/schemas/BindingInspectionInput"
+              }
+            ]
+          }
+        }
+      },
+      "Checkpoint": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "summary"
+        ],
+        "properties": {
+          "summary": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "handoffTargetSessionId": {
+            "type": "string"
+          },
+          "responsibilityIds": {
+            "type": "array",
+            "maxItems": 2000,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "Resume": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "expectedSourceSessionId",
+          "sourceVersion",
+          "responsibilityIds"
+        ],
+        "properties": {
+          "expectedSourceSessionId": {
+            "type": "string"
+          },
+          "sourceVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "format": "int64"
+          },
+          "responsibilityIds": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 2000,
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "handoffCapabilityRef": {
+            "type": "string",
+            "description": "Private managed file reference",
+            "never a raw capability": null
+          },
+          "force": {
+            "type": "boolean",
+            "description": "Owner only"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "Handoff": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "fromSessionId",
+          "toSessionId",
+          "dispositions",
+          "reason"
+        ],
+        "properties": {
+          "fromSessionId": {
+            "type": "string"
+          },
+          "toSessionId": {
+            "type": "string"
+          },
+          "handoffId": {
+            "type": "string"
+          },
+          "acceptedHandoffVersion": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "dispositions": {
+            "type": "array",
+            "maxItems": 2000,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "assignmentId",
+                "action"
+              ],
+              "properties": {
+                "assignmentId": {
+                  "type": "string"
+                },
+                "action": {
+                  "type": "string",
+                  "enum": [
+                    "transfer",
+                    "release",
+                    "continue-worker"
+                  ]
+                },
+                "targetSessionId": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "force": {
+            "type": "boolean",
+            "description": "Owner only",
+            "explicit handling of unknown source": null
+          }
+        }
+      },
+      "AcceptancePolicy": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "mode",
+          "conditions",
+          "ownerProtected"
+        ],
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "integrator",
+              "designated-agent",
+              "human"
+            ]
+          },
+          "acceptorId": {
+            "type": "string"
+          },
+          "conditions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 200,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            "uniqueItems": true
+          },
+          "ownerProtected": {
+            "type": "boolean"
+          }
+        }
+      },
+      "TaskCreate": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "projectId",
+          "goal",
+          "scope",
+          "nonScope",
+          "authorityRefs",
+          "risk",
+          "acceptancePolicy",
+          "collaboratorLimit"
+        ],
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "goal": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "scope": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 200,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          },
+          "nonScope": {
+            "type": "array",
+            "maxItems": 200,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          },
+          "authorityRefs": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 200,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          },
+          "risk": {
+            "type": "string",
+            "enum": [
+              "low",
+              "normal",
+              "high"
+            ]
+          },
+          "acceptancePolicy": {
+            "$ref": "#/components/schemas/AcceptancePolicy"
+          },
+          "collaboratorLimit": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 64
+          },
+          "designatedIntegratorId": {
+            "type": "string"
+          }
+        }
+      },
+      "Task": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "projectId",
+          "goal",
+          "scope",
+          "nonScope",
+          "authorityRefs",
+          "risk",
+          "acceptancePolicy",
+          "collaboratorLimit",
+          "id",
+          "version",
+          "specVersion",
+          "acceptancePolicyVersion",
+          "createdBy",
+          "actorKind",
+          "integratorEpoch",
+          "phase",
+          "canStart",
+          "collaboratorCount",
+          "attention",
+          "acceptanceConstraints",
+          "decisionVersions"
+        ],
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "goal": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "scope": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 200,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          },
+          "nonScope": {
+            "type": "array",
+            "maxItems": 200,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          },
+          "authorityRefs": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 200,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          },
+          "risk": {
+            "type": "string",
+            "enum": [
+              "low",
+              "normal",
+              "high"
+            ]
+          },
+          "acceptancePolicy": {
+            "$ref": "#/components/schemas/AcceptancePolicy"
+          },
+          "collaboratorLimit": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 64
+          },
+          "designatedIntegratorId": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "specVersion": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "acceptancePolicyVersion": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "actorKind": {
+            "type": "string",
+            "enum": [
+              "human",
+              "agent"
+            ]
+          },
+          "integratorId": {
+            "type": "string"
+          },
+          "integratorSessionId": {
+            "type": "string"
+          },
+          "integratorEpoch": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "phase": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "ready",
+              "active",
+              "integrating",
+              "review",
+              "done",
+              "cancelled"
+            ]
+          },
+          "canStart": {
+            "type": "boolean"
+          },
+          "collaboratorCount": {
+            "type": "integer"
+          },
+          "attention": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "acceptanceConstraints": {
+            "$ref": "#/components/schemas/AcceptanceConstraints"
+          },
+          "currentCandidateId": {
+            "type": "string"
+          },
+          "latestIntegrationId": {
+            "type": "string"
+          },
+          "lastCompletionId": {
+            "type": "string"
+          },
+          "decisionVersions": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          },
+          "participantIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "recordRefs": {
+            "type": "array",
+            "readOnly": true,
+            "items": {
+              "type": "object",
+              "required": [
+                "bindingId",
+                "number",
+                "url",
+                "taskVersion"
+              ],
+              "properties": {
+                "bindingId": {
+                  "type": "string"
+                },
+                "number": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "taskVersion": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "sourceRequestId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "sourceRequestText": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "sourceConstraints": {
+            "type": "array",
+            "maxItems": 200,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          },
+          "collaboratorLimitSource": {
+            "type": "string",
+            "enum": [
+              "owner"
+            ]
+          }
+        }
+      },
+      "AssignmentCreate": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "taskId",
+          "role",
+          "input",
+          "output",
+          "writeScope",
+          "repoId",
+          "baseRef",
+          "dependencies"
+        ],
+        "properties": {
+          "taskId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "input": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "output": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "writeScope": {
+            "type": "array",
+            "maxItems": 200,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          },
+          "repoId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "baseRef": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "dependencies": {
+            "type": "array",
+            "maxItems": 200,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "AssignmentUpdate": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": [
+              "active",
+              "blocked",
+              "cancelled"
+            ]
+          },
+          "dependencies": {
+            "type": "array",
+            "maxItems": 200,
+            "items": {
+              "type": "string"
+            }
+          },
+          "role": {
+            "type": "string"
+          },
+          "input": {
+            "type": "string"
+          },
+          "output": {
+            "type": "string"
+          },
+          "writeScope": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "repoId": {
+            "type": "string"
+          },
+          "baseRef": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "description": "Cancelled requires owner/current integrator, exact assignment version and reason, without contract edits; preserves immutable deliveries and leaves dependent assignments blocked."
+      },
+      "Release": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reason"
+        ],
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "exitTask": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Limit": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "limit",
+          "reason"
+        ],
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 64
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "Reason": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reason"
+        ],
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "ProjectCreate": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "repositories"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "repositories": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "reference"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "reference": {
+                  "type": "string",
+                  "maxLength": 2048
+                }
+              }
+            }
+          }
+        }
+      },
+      "Empty": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "Enrollment": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "serviceId",
+          "datasetGeneration",
+          "clientRequestId",
+          "name"
+        ],
+        "properties": {
+          "serviceId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "datasetGeneration": {
+            "type": "string",
+            "minLength": 1
+          },
+          "clientRequestId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        }
+      },
+      "Credentials": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "participantId",
+          "sessionId",
+          "token"
+        ],
+        "properties": {
+          "participantId": {
+            "type": "string"
+          },
+          "sessionId": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string",
+            "description": "Secret; write only to private credential storage",
+            "never model output": null
+          }
+        }
+      },
+      "Envelope": {
+        "type": "object",
+        "required": [
+          "requestId",
+          "result",
+          "objectVersions",
+          "committedEventId",
+          "unread",
+          "cursor",
+          "hasMore",
+          "serverTime",
+          "connection"
+        ],
+        "properties": {
+          "requestId": {
+            "type": "string"
+          },
+          "result": {},
+          "objectVersions": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "committedEventId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "unread": {
+            "type": "array",
+            "items": {}
+          },
+          "cursor": {
+            "type": "string"
+          },
+          "hasMore": {
+            "type": "boolean"
+          },
+          "serverTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "connection": {
+            "const": "online"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "Identity": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "serviceId",
+          "datasetGeneration",
+          "protocolVersion"
+        ],
+        "properties": {
+          "status": {
+            "const": "ok"
+          },
+          "serviceId": {
+            "type": "string"
+          },
+          "datasetGeneration": {
+            "type": "string"
+          },
+          "protocolVersion": {
+            "const": 1
+          }
+        }
+      },
+      "MessageSend": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "projectId",
+          "threadId",
+          "purpose",
+          "priority",
+          "body",
+          "recipientMode",
+          "recipientIds",
+          "actionRequired"
+        ],
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "taskId": {
+            "type": "string"
+          },
+          "assignmentId": {
+            "type": "string"
+          },
+          "threadId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "purpose": {
+            "type": "string",
+            "enum": [
+              "question",
+              "proposal",
+              "contract-change",
+              "handoff",
+              "delivery",
+              "decision-notice",
+              "status",
+              "discussion"
+            ]
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "normal",
+              "urgent"
+            ]
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "description": "At most 16384 UTF-8 bytes; never silently truncated"
+          },
+          "recipientMode": {
+            "type": "string",
+            "enum": [
+              "participants",
+              "integrator",
+              "assignment",
+              "project"
+            ]
+          },
+          "recipientIds": {
+            "type": "array",
+            "maxItems": 200,
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "actionRequired": {
+            "type": "boolean"
+          },
+          "localOccurredAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Message": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "projectId",
+          "threadId",
+          "purpose",
+          "priority",
+          "body",
+          "recipientMode",
+          "recipientIds",
+          "actionRequired",
+          "id",
+          "actorId",
+          "actorKind",
+          "receivedAt"
+        ],
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "taskId": {
+            "type": "string"
+          },
+          "assignmentId": {
+            "type": "string"
+          },
+          "threadId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "purpose": {
+            "type": "string",
+            "enum": [
+              "question",
+              "proposal",
+              "contract-change",
+              "handoff",
+              "delivery",
+              "decision-notice",
+              "status",
+              "discussion"
+            ]
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "normal",
+              "urgent"
+            ]
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "description": "At most 16384 UTF-8 bytes; never silently truncated"
+          },
+          "recipientMode": {
+            "type": "string",
+            "enum": [
+              "participants",
+              "integrator",
+              "assignment",
+              "project"
+            ]
+          },
+          "recipientIds": {
+            "type": "array",
+            "maxItems": 200,
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "actionRequired": {
+            "type": "boolean"
+          },
+          "localOccurredAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string"
+          },
+          "actorId": {
+            "type": "string"
+          },
+          "actorKind": {
+            "type": "string",
+            "enum": [
+              "human",
+              "agent"
+            ]
+          },
+          "sessionId": {
+            "type": "string"
+          },
+          "receivedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "receipts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "participantId",
+                "state",
+                "version",
+                "metadata"
+              ],
+              "properties": {
+                "participantId": {
+                  "type": "string"
+                },
+                "state": {
+                  "type": "string"
+                },
+                "version": {
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "metadata": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "imported": {
+            "type": "boolean"
+          },
+          "offlineSource": {
+            "type": "object",
+            "description": "Self-reported original session/time/base versions; not authority"
+          }
+        }
+      },
+      "ReceiptUpdate": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "state"
+        ],
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": [
+              "fetched",
+              "seen",
+              "accepted",
+              "declined",
+              "resolved"
+            ]
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 8192
+          },
+          "evidenceRefs": {
+            "type": "array",
+            "maxItems": 200,
+            "items": {
+              "type": "string",
+              "maxLength": 4096
+            }
+          }
+        }
+      },
+      "Event": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "seq",
+          "scope",
+          "body",
+          "receivedAt"
+        ],
+        "properties": {
+          "seq": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "scope": {
+            "type": "string"
+          },
+          "body": {
+            "type": "object",
+            "description": "Typed domain event; a large message uses messageRef and must be fetched separately"
+          },
+          "receivedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "SyncPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "events",
+          "cursor",
+          "hasMore",
+          "bytes",
+          "serverTime",
+          "connection"
+        ],
+        "properties": {
+          "events": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "$ref": "#/components/schemas/Event"
+            }
+          },
+          "cursor": {
+            "type": "string"
+          },
+          "hasMore": {
+            "type": "boolean"
+          },
+          "bytes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "serverTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "connection": {
+            "const": "online"
+          }
+        }
+      },
+      "PolicyRequirement": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "text",
+          "source"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "owner",
+              "agent",
+              "system"
+            ]
+          }
+        }
+      },
+      "AcceptanceConstraints": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "modeSource",
+          "acceptorSource",
+          "requirements"
+        ],
+        "properties": {
+          "modeSource": {
+            "type": "string",
+            "enum": [
+              "owner",
+              "agent",
+              "system"
+            ]
+          },
+          "acceptorSource": {
+            "type": "string",
+            "enum": [
+              "owner",
+              "agent",
+              "system"
+            ]
+          },
+          "requirements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PolicyRequirement"
+            }
+          }
+        }
+      },
+      "DecisionOption": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "label",
+          "impact"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "impact": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "answered",
+              "approved",
+              "rejected",
+              "revise"
+            ]
+          }
+        }
+      },
+      "DecisionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "scopeKey",
+          "question",
+          "reason",
+          "factRefs",
+          "options",
+          "recommendation",
+          "recommendationReason",
+          "impact",
+          "blockedAssignmentIds",
+          "blockedActions",
+          "canContinue",
+          "noDecisionBehavior"
+        ],
+        "properties": {
+          "taskId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "scopeKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "description": "system: prefix reserved for service-generated risk questions"
+          },
+          "question": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "factRefs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            "maxItems": 200
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DecisionOption"
+            },
+            "minItems": 2,
+            "maxItems": 3
+          },
+          "recommendation": {
+            "type": "string"
+          },
+          "recommendationReason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "impact": {
+            "type": "string",
+            "minLength": 1
+          },
+          "blockedAssignmentIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 2000
+          },
+          "blockedActions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "implementation",
+                "delivery",
+                "integration",
+                "acceptance",
+                "completion",
+                "spec-change",
+                "external-action"
+              ]
+            },
+            "maxItems": 8
+          },
+          "canContinue": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            "maxItems": 200
+          },
+          "noDecisionBehavior": {
+            "type": "string",
+            "minLength": 1
+          },
+          "deadline": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "actionKind": {
+            "type": "string",
+            "enum": [
+              "decision-pending",
+              "owner-blocker"
+            ]
+          },
+          "requestId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "externalProposal": {
+            "$ref": "#/components/schemas/ExternalAuthorization"
+          },
+          "specProposal": {
+            "$ref": "#/components/schemas/SpecAmendment"
+          }
+        },
+        "oneOf": [
+          {
+            "required": [
+              "taskId"
+            ],
+            "not": {
+              "required": [
+                "requestId"
+              ]
+            }
+          },
+          {
+            "required": [
+              "requestId"
+            ],
+            "not": {
+              "required": [
+                "taskId"
+              ]
+            }
+          }
+        ],
+        "description": "Exactly one Task or intake Request subject. Question identity/history remain unchanged on conversion. Pre-task questions require current preparation version/epoch and block request-convert. Proposals are not authority."
+      },
+      "SpecAmendment": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "goal",
+          "scope",
+          "nonScope",
+          "authorityRefs",
+          "risk"
+        ],
+        "properties": {
+          "goal": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "scope": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            "maxItems": 200
+          },
+          "nonScope": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            "maxItems": 200
+          },
+          "authorityRefs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            "maxItems": 200
+          },
+          "risk": {
+            "type": "string",
+            "enum": [
+              "low",
+              "normal",
+              "high"
+            ]
+          }
+        }
+      },
+      "ExternalAuthorization": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "action",
+          "target",
+          "scope",
+          "originalText",
+          "expiresAt",
+          "maxUses"
+        ],
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "push",
+              "pr",
+              "merge",
+              "release",
+              "deploy"
+            ]
+          },
+          "target": {
+            "type": "string",
+            "minLength": 1
+          },
+          "scope": {
+            "type": "string",
+            "minLength": 1
+          },
+          "originalText": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "maxUses": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1,
+            "maximum": 100
+          }
+        }
+      },
+      "DecisionResolve": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "answer"
+        ],
+        "properties": {
+          "answer": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "optionId": {
+            "type": "string"
+          },
+          "supersedesDecisionId": {
+            "type": "string"
+          },
+          "authorityFollowUpRequired": {
+            "type": "boolean"
+          },
+          "externalAuthorization": {
+            "$ref": "#/components/schemas/ExternalAuthorization"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "answered",
+              "approved",
+              "rejected",
+              "revise"
+            ]
+          },
+          "specAmendment": {
+            "$ref": "#/components/schemas/SpecAmendment"
+          }
+        }
+      },
+      "DecisionFollowup": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reason",
+          "evidenceRefs"
+        ],
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidenceRefs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            "maxItems": 200
+          }
+        }
+      },
+      "ArtifactRef": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reference",
+          "digest"
+        ],
+        "properties": {
+          "reference": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]{64}$"
+          }
+        }
+      },
+      "DeliverySubmit": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "repoId",
+          "baseSha",
+          "headSha",
+          "branchRef",
+          "workspaceRef",
+          "summary",
+          "evidenceRefs",
+          "unknowns",
+          "artifactRefs"
+        ],
+        "properties": {
+          "repoId": {
+            "type": "string"
+          },
+          "baseSha": {
+            "type": "string",
+            "pattern": "^([a-fA-F0-9]{40}|[a-fA-F0-9]{64})$"
+          },
+          "headSha": {
+            "type": "string",
+            "pattern": "^([a-fA-F0-9]{40}|[a-fA-F0-9]{64})$"
+          },
+          "branchRef": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "workspaceRef": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "evidenceRefs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            "maxItems": 200
+          },
+          "unknowns": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            "maxItems": 200
+          },
+          "artifactRefs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ArtifactRef"
+            },
+            "maxItems": 200
+          }
+        }
+      },
+      "DeliveryReview": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "deliveryRevisionId",
+          "disposition",
+          "reason"
+        ],
+        "properties": {
+          "deliveryRevisionId": {
+            "type": "string"
+          },
+          "disposition": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "returned"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          }
+        }
+      },
+      "IntegrationHead": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "repoId",
+          "baseSha",
+          "headSha"
+        ],
+        "properties": {
+          "repoId": {
+            "type": "string"
+          },
+          "baseSha": {
+            "type": "string"
+          },
+          "headSha": {
+            "type": "string"
+          }
+        }
+      },
+      "EvidenceCheck": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "condition",
+          "outcome",
+          "headShas",
+          "evidenceRefs"
+        ],
+        "properties": {
+          "condition": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "passed",
+              "failed",
+              "unverified"
+            ]
+          },
+          "headShas": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "evidenceRefs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            "maxItems": 200
+          }
+        }
+      },
+      "IntegrationRecord": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "deliveryRevisionIds",
+          "heads",
+          "checks",
+          "summary",
+          "result",
+          "excludedAssignments",
+          "untested"
+        ],
+        "properties": {
+          "deliveryRevisionIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 2000,
+            "uniqueItems": true
+          },
+          "heads": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IntegrationHead"
+            },
+            "minItems": 1,
+            "maxItems": 20
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EvidenceCheck"
+            },
+            "maxItems": 200
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "result": {
+            "type": "string",
+            "enum": [
+              "passed",
+              "failed"
+            ]
+          },
+          "excludedAssignments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "assignmentId",
+                "reason"
+              ],
+              "properties": {
+                "assignmentId": {
+                  "type": "string"
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 8192
+                }
+              }
+            },
+            "maxItems": 2000
+          },
+          "untested": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            "maxItems": 200
+          }
+        }
+      },
+      "AcceptancePolicyChange": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "policy",
+          "reason"
+        ],
+        "properties": {
+          "policy": {
+            "$ref": "#/components/schemas/AcceptancePolicy"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          }
+        }
+      },
+      "AcceptanceCandidate": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "integrationId"
+        ],
+        "properties": {
+          "integrationId": {
+            "type": "string"
+          }
+        }
+      },
+      "AcceptCandidate": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "candidateId"
+        ],
+        "properties": {
+          "candidateId": {
+            "type": "string"
+          }
+        }
+      },
+      "Assignment": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "taskId",
+          "role",
+          "input",
+          "output",
+          "writeScope",
+          "repoId",
+          "baseRef",
+          "dependencies",
+          "id",
+          "version",
+          "claimEpoch",
+          "state",
+          "required",
+          "canStart",
+          "contractVersion"
+        ],
+        "properties": {
+          "taskId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "input": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "output": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "writeScope": {
+            "type": "array",
+            "maxItems": 200,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          },
+          "repoId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "baseRef": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "dependencies": {
+            "type": "array",
+            "maxItems": 200,
+            "items": {
+              "type": "string"
+            }
+          },
+          "id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "claimParticipantId": {
+            "type": "string"
+          },
+          "claimSessionId": {
+            "type": "string"
+          },
+          "claimEpoch": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "open",
+              "claimed",
+              "active",
+              "blocked",
+              "submitted",
+              "accepted",
+              "cancelled"
+            ]
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "canStart": {
+            "type": "boolean"
+          },
+          "currentDeliveryId": {
+            "type": "string"
+          },
+          "acceptedDeliveryId": {
+            "type": "string"
+          },
+          "contractVersion": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "cancellationReason": {
+            "type": "string",
+            "maxLength": 8192
+          }
+        }
+      },
+      "OriginalCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "targetId",
+          "meta",
+          "payload"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "targetId": {
+            "type": "string"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/OriginalMutation"
+          },
+          "payload": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProjectCreate"
+              },
+              {
+                "$ref": "#/components/schemas/Empty"
+              },
+              {
+                "$ref": "#/components/schemas/TaskCreate"
+              },
+              {
+                "$ref": "#/components/schemas/AssignmentCreate"
+              },
+              {
+                "$ref": "#/components/schemas/Release"
+              },
+              {
+                "$ref": "#/components/schemas/AssignmentUpdate"
+              },
+              {
+                "$ref": "#/components/schemas/Limit"
+              },
+              {
+                "$ref": "#/components/schemas/Reason"
+              },
+              {
+                "$ref": "#/components/schemas/Checkpoint"
+              },
+              {
+                "$ref": "#/components/schemas/Resume"
+              },
+              {
+                "$ref": "#/components/schemas/Handoff"
+              },
+              {
+                "$ref": "#/components/schemas/MessageSend"
+              },
+              {
+                "$ref": "#/components/schemas/ReceiptUpdate"
+              },
+              {
+                "$ref": "#/components/schemas/DecisionRequest"
+              },
+              {
+                "$ref": "#/components/schemas/DecisionResolve"
+              },
+              {
+                "$ref": "#/components/schemas/DecisionFollowup"
+              },
+              {
+                "$ref": "#/components/schemas/DeliverySubmit"
+              },
+              {
+                "$ref": "#/components/schemas/DeliveryReview"
+              },
+              {
+                "$ref": "#/components/schemas/IntegrationRecord"
+              },
+              {
+                "$ref": "#/components/schemas/AcceptancePolicyChange"
+              },
+              {
+                "$ref": "#/components/schemas/AcceptanceCandidate"
+              },
+              {
+                "$ref": "#/components/schemas/AcceptCandidate"
+              }
+            ]
+          }
+        }
+      },
+      "OfflineReconcile": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "projectId",
+          "localId",
+          "originalRequestId",
+          "originalCommand",
+          "baseCursor",
+          "localOccurredAt"
+        ],
+        "properties": {
+          "projectId": {
+            "type": "string"
+          },
+          "localId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "originalRequestId": {
+            "type": "string"
+          },
+          "originalCommand": {
+            "$ref": "#/components/schemas/OriginalCommand"
+          },
+          "baseCursor": {
+            "type": "string"
+          },
+          "localOccurredAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "OfflineReview": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "disposition",
+          "reason",
+          "evidenceRefs"
+        ],
+        "properties": {
+          "disposition": {
+            "type": "string",
+            "enum": [
+              "reissue",
+              "retain-artifact",
+              "discard"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "evidenceRefs": {
+            "type": "array",
+            "maxItems": 200,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          }
+        }
+      },
+      "OriginalMutation": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "serviceId",
+          "datasetGeneration",
+          "clientRequestId"
+        ],
+        "properties": {
+          "serviceId": {
+            "type": "string",
+            "description": "May be empty only in an original provisional offline record"
+          },
+          "datasetGeneration": {
+            "type": "string",
+            "description": "May be empty only in an original provisional offline record"
+          },
+          "clientRequestId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "claimEpoch": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "integratorEpoch": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "specVersion": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "acceptancePolicyVersion": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "sessionId": {
+            "type": "string"
+          },
+          "decisionVersions": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        }
+      },
+      "RepositoryView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "projectId": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "projectId",
+          "version",
+          "name",
+          "reference"
+        ]
+      },
+      "ProjectView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "repositories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RepositoryView"
+            }
+          },
+          "enrollmentEnabled": {
+            "type": "boolean",
+            "description": "Returned only to human owners; no enrollment capability."
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "name",
+          "repositories"
+        ]
+      },
+      "ParticipantView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "SessionView": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "participantId": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string"
+          },
+          "presence": {
+            "type": "string"
+          },
+          "lastSeenAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "pendingWaits": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "participantId",
+          "version",
+          "status",
+          "presence",
+          "lastSeenAt",
+          "pendingWaits"
+        ]
+      },
+      "DecisionRequestView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "taskId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "scopeKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "description": "system: prefix reserved for service-generated risk questions"
+          },
+          "question": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "factRefs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            "maxItems": 200
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DecisionOption"
+            },
+            "minItems": 2,
+            "maxItems": 3
+          },
+          "recommendation": {
+            "type": "string"
+          },
+          "recommendationReason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "impact": {
+            "type": "string",
+            "minLength": 1
+          },
+          "blockedAssignmentIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 2000
+          },
+          "blockedActions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "implementation",
+                "delivery",
+                "integration",
+                "acceptance",
+                "completion",
+                "spec-change",
+                "external-action"
+              ]
+            },
+            "maxItems": 8
+          },
+          "canContinue": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            "maxItems": 200
+          },
+          "noDecisionBehavior": {
+            "type": "string",
+            "minLength": 1
+          },
+          "deadline": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string"
+          },
+          "projectId": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "state": {
+            "type": "string"
+          },
+          "actorId": {
+            "type": "string"
+          },
+          "actorKind": {
+            "type": "string"
+          },
+          "receivedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "currentDecisionId": {
+            "type": "string"
+          },
+          "decisionVersion": {
+            "type": "integer"
+          },
+          "followUpRequired": {
+            "type": "boolean"
+          },
+          "followUpComplete": {
+            "type": "boolean"
+          },
+          "followUpEvidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "specVersion": {
+            "type": "integer"
+          },
+          "approvedSpecVersion": {
+            "type": "integer"
+          },
+          "resolutionOutcome": {
+            "type": "string"
+          },
+          "actionKind": {
+            "type": "string",
+            "enum": [
+              "decision-pending",
+              "owner-blocker"
+            ]
+          },
+          "requestId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "externalProposal": {
+            "$ref": "#/components/schemas/ExternalAuthorization"
+          },
+          "specProposal": {
+            "$ref": "#/components/schemas/SpecAmendment"
+          }
+        },
+        "required": [
+          "scopeKey",
+          "question",
+          "reason",
+          "factRefs",
+          "options",
+          "recommendation",
+          "recommendationReason",
+          "impact",
+          "blockedAssignmentIds",
+          "blockedActions",
+          "canContinue",
+          "noDecisionBehavior",
+          "id",
+          "projectId",
+          "version",
+          "state",
+          "actorId",
+          "actorKind",
+          "receivedAt",
+          "decisionVersion",
+          "followUpRequired",
+          "followUpComplete",
+          "specVersion",
+          "approvedSpecVersion"
+        ],
+        "oneOf": [
+          {
+            "required": [
+              "taskId"
+            ],
+            "not": {
+              "required": [
+                "requestId"
+              ]
+            }
+          },
+          {
+            "required": [
+              "requestId"
+            ],
+            "not": {
+              "required": [
+                "taskId"
+              ]
+            }
+          }
+        ],
+        "description": "Exactly one Task or intake Request subject. Question identity/history remain unchanged on conversion. Pre-task questions require current preparation version/epoch and block request-convert. Proposals are not authority."
+      },
+      "DecisionView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "requestId": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer"
+          },
+          "answer": {
+            "type": "string"
+          },
+          "optionId": {
+            "type": "string"
+          },
+          "supersedesDecisionId": {
+            "type": "string"
+          },
+          "actorId": {
+            "type": "string"
+          },
+          "actorKind": {
+            "type": "string"
+          },
+          "receivedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "authorityFollowUpRequired": {
+            "type": "boolean"
+          },
+          "outcome": {
+            "type": "string"
+          },
+          "specVersion": {
+            "type": "integer"
+          },
+          "externalAuthorization": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExternalAuthorization"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "specAmendment": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SpecAmendment"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "requestId",
+          "version",
+          "answer",
+          "optionId",
+          "supersedesDecisionId",
+          "actorId",
+          "actorKind",
+          "receivedAt",
+          "authorityFollowUpRequired",
+          "outcome",
+          "specVersion",
+          "externalAuthorization",
+          "specAmendment"
+        ]
+      },
+      "DecisionHistoryView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "request": {
+            "$ref": "#/components/schemas/DecisionRequestView"
+          },
+          "history": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DecisionView"
+            }
+          }
+        },
+        "required": [
+          "request",
+          "history"
+        ]
+      },
+      "DeliveryView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "repoId": {
+            "type": "string"
+          },
+          "baseSha": {
+            "type": "string",
+            "pattern": "^([a-fA-F0-9]{40}|[a-fA-F0-9]{64})$"
+          },
+          "headSha": {
+            "type": "string",
+            "pattern": "^([a-fA-F0-9]{40}|[a-fA-F0-9]{64})$"
+          },
+          "branchRef": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "workspaceRef": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "evidenceRefs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            "maxItems": 200
+          },
+          "unknowns": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            "maxItems": 200
+          },
+          "artifactRefs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ArtifactRef"
+            },
+            "maxItems": 200
+          },
+          "id": {
+            "type": "string"
+          },
+          "taskId": {
+            "type": "string"
+          },
+          "assignmentId": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer"
+          },
+          "actorId": {
+            "type": "string"
+          },
+          "actorKind": {
+            "type": "string"
+          },
+          "sessionId": {
+            "type": "string"
+          },
+          "claimEpoch": {
+            "type": "integer"
+          },
+          "specVersion": {
+            "type": "integer"
+          },
+          "decisionVersions": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer"
+            }
+          },
+          "receivedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "assignmentContractVersion": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "repoId",
+          "baseSha",
+          "headSha",
+          "branchRef",
+          "workspaceRef",
+          "summary",
+          "evidenceRefs",
+          "unknowns",
+          "artifactRefs",
+          "id",
+          "taskId",
+          "assignmentId",
+          "revision",
+          "actorId",
+          "actorKind",
+          "sessionId",
+          "claimEpoch",
+          "specVersion",
+          "decisionVersions",
+          "receivedAt",
+          "assignmentContractVersion"
+        ]
+      },
+      "IntegrationView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "deliveryRevisionIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 2000,
+            "uniqueItems": true
+          },
+          "heads": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IntegrationHead"
+            },
+            "minItems": 1,
+            "maxItems": 20
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EvidenceCheck"
+            },
+            "maxItems": 200
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "result": {
+            "type": "string",
+            "enum": [
+              "passed",
+              "failed"
+            ]
+          },
+          "excludedAssignments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "assignmentId",
+                "reason"
+              ],
+              "properties": {
+                "assignmentId": {
+                  "type": "string"
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 8192
+                }
+              }
+            },
+            "maxItems": 2000
+          },
+          "untested": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            "maxItems": 200
+          },
+          "id": {
+            "type": "string"
+          },
+          "taskId": {
+            "type": "string"
+          },
+          "specVersion": {
+            "type": "integer"
+          },
+          "acceptancePolicyVersion": {
+            "type": "integer"
+          },
+          "decisionVersions": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer"
+            }
+          },
+          "integratorEpoch": {
+            "type": "integer"
+          },
+          "actorId": {
+            "type": "string"
+          },
+          "actorKind": {
+            "type": "string"
+          },
+          "sessionId": {
+            "type": "string"
+          },
+          "receivedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "deliveryRevisionIds",
+          "heads",
+          "checks",
+          "summary",
+          "result",
+          "excludedAssignments",
+          "untested",
+          "id",
+          "taskId",
+          "specVersion",
+          "acceptancePolicyVersion",
+          "decisionVersions",
+          "integratorEpoch",
+          "actorId",
+          "actorKind",
+          "sessionId",
+          "receivedAt"
+        ]
+      },
+      "CandidateView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "taskId": {
+            "type": "string"
+          },
+          "integration": {
+            "$ref": "#/components/schemas/IntegrationView"
+          },
+          "policy": {
+            "$ref": "#/components/schemas/AcceptancePolicy"
+          },
+          "constraints": {
+            "$ref": "#/components/schemas/AcceptanceConstraints"
+          },
+          "actorId": {
+            "type": "string"
+          },
+          "receivedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "taskId",
+          "integration",
+          "policy",
+          "constraints",
+          "actorId",
+          "receivedAt"
+        ]
+      },
+      "CandidateStatusView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "candidate": {
+            "$ref": "#/components/schemas/CandidateView"
+          },
+          "stale": {
+            "type": "boolean"
+          },
+          "evidenceSource": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "candidate",
+          "stale",
+          "evidenceSource"
+        ]
+      },
+      "AcceptanceView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "taskId": {
+            "type": "string"
+          },
+          "candidateId": {
+            "type": "string"
+          },
+          "actorId": {
+            "type": "string"
+          },
+          "participantId": {
+            "type": "string"
+          },
+          "actorKind": {
+            "type": "string"
+          },
+          "sessionId": {
+            "type": "string"
+          },
+          "integratorEpoch": {
+            "type": "integer"
+          },
+          "acceptancePolicyVersion": {
+            "type": "integer"
+          },
+          "receivedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "source": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "taskId",
+          "candidateId",
+          "actorId",
+          "participantId",
+          "actorKind",
+          "sessionId",
+          "integratorEpoch",
+          "acceptancePolicyVersion",
+          "receivedAt",
+          "source"
+        ]
+      },
+      "CompletionView": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "taskId": {
+            "type": "string"
+          },
+          "taskVersion": {
+            "type": "integer"
+          },
+          "candidate": {
+            "$ref": "#/components/schemas/CandidateView"
+          },
+          "acceptanceId": {
+            "type": "string"
+          },
+          "actorId": {
+            "type": "string"
+          },
+          "actorKind": {
+            "type": "string"
+          },
+          "receivedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "evidenceSource": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "taskId",
+          "taskVersion",
+          "candidate",
+          "acceptanceId",
+          "actorId",
+          "actorKind",
+          "receivedAt",
+          "evidenceSource"
+        ]
+      },
+      "BindingPayload": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/GitHubBindingPayload"
+          },
+          {
+            "$ref": "#/components/schemas/NotificationBindingPayload"
+          }
+        ]
+      },
+      "GitHubBindingPayload": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "projectId",
+          "kind",
+          "repository",
+          "repositoryId",
+          "private",
+          "fields",
+          "events",
+          "credentialRef",
+          "enabled"
+        ],
+        "properties": {
+          "projectId": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "github"
+            ]
+          },
+          "repository": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]+/[A-Za-z0-9_.-]+$"
+          },
+          "repositoryId": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "private": {
+            "type": "boolean"
+          },
+          "fields": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "enum": [
+                "taskId",
+                "goal",
+                "state",
+                "scope",
+                "acceptance"
+              ]
+            }
+          },
+          "events": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "enum": [
+                "task.create",
+                "task.complete",
+                "task.cancel",
+                "task.reopen",
+                "integration.record",
+                "decision.request",
+                "decision.resolve",
+                "decision.supersede",
+                "delivery.submit",
+                "delivery.review",
+                "acceptance.candidate",
+                "acceptance.accept"
+              ]
+            }
+          },
+          "credentialRef": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]{1,128}$"
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "NotificationBindingPayload": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "projectId",
+          "kind",
+          "fields",
+          "events",
+          "credentialRef",
+          "enabled"
+        ],
+        "properties": {
+          "projectId": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "dingtalk"
+            ]
+          },
+          "fields": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "enum": [
+                "taskId",
+                "goal",
+                "summary",
+                "projectTitle"
+              ]
+            }
+          },
+          "events": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "enum": [
+                "decision-pending",
+                "human-acceptance",
+                "owner-blocker"
+              ]
+            }
+          },
+          "credentialRef": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]{1,128}$"
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ControlIdentity": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "serviceId",
+          "datasetGeneration"
+        ],
+        "properties": {
+          "serviceId": {
+            "type": "string"
+          },
+          "datasetGeneration": {
+            "type": "string"
+          }
+        }
+      },
+      "ControlProof": {
+        "type": "object",
+        "required": [
+          "protocolVersion",
+          "serviceId",
+          "datasetGeneration",
+          "dataRoot",
+          "executable",
+          "needsActivation"
+        ],
+        "properties": {
+          "protocolVersion": {
+            "type": "integer",
+            "const": 1
+          },
+          "serviceId": {
+            "type": "string"
+          },
+          "datasetGeneration": {
+            "type": "string"
+          },
+          "dataRoot": {
+            "type": "string"
+          },
+          "executable": {
+            "type": "string"
+          },
+          "needsActivation": {
+            "type": "boolean"
+          }
+        }
+      },
+      "RequestCreate": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "constraints": {
+            "type": "array",
+            "maxItems": 200,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          },
+          "collaboratorLimit": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 64
+          },
+          "designatedIntegratorId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "acceptancePolicy": {
+            "$ref": "#/components/schemas/AcceptancePolicy"
+          }
+        },
+        "required": [
+          "projectId",
+          "text"
+        ],
+        "description": "Human-only durable intent, not an executable Task. Optional owner requirements must be preserved during conversion."
+      },
+      "WorkRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "constraints": {
+            "type": "array",
+            "maxItems": 200,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          },
+          "collaboratorLimit": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 64
+          },
+          "designatedIntegratorId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "acceptancePolicy": {
+            "$ref": "#/components/schemas/AcceptancePolicy"
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "version": {
+            "type": "integer"
+          },
+          "createdBy": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "actorKind": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "waiting",
+              "preparing",
+              "converted",
+              "cancelled"
+            ]
+          },
+          "preparerParticipantId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "preparerSessionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "preparationEpoch": {
+            "type": "integer"
+          },
+          "offeredSessionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "taskId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "convertedSpecVersion": {
+            "type": "integer"
+          },
+          "lastReason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          }
+        },
+        "required": [
+          "projectId",
+          "text",
+          "id",
+          "version",
+          "createdBy",
+          "actorKind",
+          "createdAt",
+          "state",
+          "preparationEpoch"
+        ],
+        "description": "Human-only durable intent, not an executable Task. Optional owner requirements must be preserved during conversion."
+      },
+      "RequestHandoff": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "toSessionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "reason",
+          "toSessionId"
+        ]
+      },
+      "RequestResume": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "expectedSourceSessionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "expectedSourceSessionId"
+        ]
+      },
+      "RequestAssign": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "toSessionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "expectedSourceSessionId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason",
+          "toSessionId"
+        ],
+        "description": "Owner-only forced preparation takeover; expectedVersion must match the displayed Request. No timeout stealing."
+      },
+      "RequestConvert": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "task": {
+            "$ref": "#/components/schemas/TaskCreate"
+          }
+        },
+        "required": [
+          "task"
+        ],
+        "description": "Current preparer only, Request expectedVersion and preparationEpoch in claimEpoch. Requires acknowledged formal decision versions. Atomically returns the linked WorkRequest; its taskId names the unique complete Task."
+      },
+      "BindingCredential": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "github",
+              "dingtalk"
+            ]
+          },
+          "token": {
+            "type": "string",
+            "writeOnly": true,
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "secret": {
+            "type": "string",
+            "writeOnly": true,
+            "maxLength": 512
+          },
+          "webhookUrl": {
+            "type": "string",
+            "writeOnly": true,
+            "minLength": 1,
+            "maxLength": 2048,
+            "description": "Exact official HTTPS DingTalk URL with a single access_token. No arbitrary endpoint."
+          }
+        },
+        "description": "Human cookie + Origin + CSRF only. Secret material stored only in a product-private file; receipt contains credentialRef and kind.",
+        "oneOf": [
+          {
+            "required": [
+              "token"
+            ],
+            "not": {
+              "required": [
+                "webhookUrl"
+              ]
+            }
+          },
+          {
+            "required": [
+              "webhookUrl"
+            ],
+            "not": {
+              "required": [
+                "token"
+              ]
+            }
+          }
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "dingtalk"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "secret"
+              ],
+              "properties": {
+                "secret": {
+                  "minLength": 1
+                }
+              }
+            },
+            "else": {
+              "required": [
+                "token"
+              ],
+              "properties": {
+                "secret": {
+                  "maxLength": 0
+                }
+              }
+            }
+          }
+        ]
+      },
+      "BindingInspectionInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "repository": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "credentialRef": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "repository",
+          "credentialRef"
+        ],
+        "description": "Owner-only. Repository URL or owner/repo; GET official api.github.com only, no redirects or probe write. Metadata read cannot establish Issues write permission."
+      },
+      "RepositoryInspection": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "repository": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "repositoryId": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "private": {
+            "type": "boolean"
+          },
+          "hasIssues": {
+            "type": "boolean"
+          },
+          "issuesWriteVerified": {
+            "type": "boolean",
+            "const": false
+          }
+        },
+        "required": [
+          "repository",
+          "repositoryId",
+          "private",
+          "hasIssues",
+          "issuesWriteVerified"
+        ]
+      },
+      "ConnectionInfo": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "clientPath": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "skillPath": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "dataDir": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "serviceURL": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          }
+        },
+        "required": [
+          "clientPath",
+          "skillPath",
+          "dataDir",
+          "serviceURL"
+        ]
+      }
+    }
+  },
+  "x-command-payloads": {
+    "project.create": {
+      "$ref": "#/components/schemas/ProjectCreate"
+    },
+    "enrollment.enable": {
+      "$ref": "#/components/schemas/Empty"
+    },
+    "participant.revoke": {
+      "$ref": "#/components/schemas/Empty"
+    },
+    "task.create": {
+      "$ref": "#/components/schemas/TaskCreate"
+    },
+    "integrator.claim": {
+      "$ref": "#/components/schemas/Empty"
+    },
+    "assignment.create": {
+      "$ref": "#/components/schemas/AssignmentCreate"
+    },
+    "assignment.claim": {
+      "$ref": "#/components/schemas/Empty"
+    },
+    "assignment.release": {
+      "$ref": "#/components/schemas/Release"
+    },
+    "assignment.update": {
+      "$ref": "#/components/schemas/AssignmentUpdate"
+    },
+    "collaborator.limit": {
+      "$ref": "#/components/schemas/Limit"
+    },
+    "task.reopen": {
+      "$ref": "#/components/schemas/Reason"
+    },
+    "task.cancel": {
+      "$ref": "#/components/schemas/Reason"
+    },
+    "session.checkpoint": {
+      "$ref": "#/components/schemas/Checkpoint"
+    },
+    "session.end": {
+      "$ref": "#/components/schemas/Checkpoint"
+    },
+    "session.resume": {
+      "$ref": "#/components/schemas/Resume"
+    },
+    "integrator.handoff": {
+      "$ref": "#/components/schemas/Handoff"
+    },
+    "message.send": {
+      "$ref": "#/components/schemas/MessageSend"
+    },
+    "receipt.update": {
+      "$ref": "#/components/schemas/ReceiptUpdate"
+    },
+    "decision.request": {
+      "$ref": "#/components/schemas/DecisionRequest"
+    },
+    "decision.resolve": {
+      "$ref": "#/components/schemas/DecisionResolve"
+    },
+    "decision.supersede": {
+      "$ref": "#/components/schemas/DecisionResolve"
+    },
+    "decision.withdraw": {
+      "$ref": "#/components/schemas/Reason"
+    },
+    "decision.followup": {
+      "$ref": "#/components/schemas/DecisionFollowup"
+    },
+    "delivery.submit": {
+      "$ref": "#/components/schemas/DeliverySubmit"
+    },
+    "delivery.review": {
+      "$ref": "#/components/schemas/DeliveryReview"
+    },
+    "integration.record": {
+      "$ref": "#/components/schemas/IntegrationRecord"
+    },
+    "acceptance.policy": {
+      "$ref": "#/components/schemas/AcceptancePolicyChange"
+    },
+    "acceptance.candidate": {
+      "$ref": "#/components/schemas/AcceptanceCandidate"
+    },
+    "acceptance.accept": {
+      "$ref": "#/components/schemas/AcceptCandidate"
+    },
+    "task.complete": {
+      "$ref": "#/components/schemas/AcceptCandidate"
+    },
+    "offline.reconcile": {
+      "$ref": "#/components/schemas/OfflineReconcile"
+    },
+    "offline.resolve": {
+      "$ref": "#/components/schemas/OfflineReview"
+    },
+    "backup.create": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    },
+    "backup.export": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    },
+    "participant.recover": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    },
+    "binding.create": {
+      "$ref": "#/components/schemas/BindingPayload"
+    },
+    "binding.disable": {
+      "type": "object",
+      "additionalProperties": false
+    },
+    "binding.retry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "reason"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "retry",
+            "reconcile"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "binding.credential": {
+      "$ref": "#/components/schemas/BindingCredential"
+    },
+    "binding.rotate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "credentialRef",
+        "reason"
+      ],
+      "properties": {
+        "credentialRef": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_-]{1,128}$"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "description": "Owner-only credential rotation within the original repository or same bot; never changes target or replays an unknown write."
+    },
+    "request.create": {
+      "$ref": "#/components/schemas/RequestCreate"
+    },
+    "request.claim": {
+      "$ref": "#/components/schemas/Empty"
+    },
+    "request.release": {
+      "$ref": "#/components/schemas/Reason"
+    },
+    "request.handoff": {
+      "$ref": "#/components/schemas/RequestHandoff"
+    },
+    "request.accept": {
+      "$ref": "#/components/schemas/Empty"
+    },
+    "request.resume": {
+      "$ref": "#/components/schemas/RequestResume"
+    },
+    "request.assign": {
+      "$ref": "#/components/schemas/RequestAssign"
+    },
+    "request.cancel": {
+      "$ref": "#/components/schemas/Reason"
+    },
+    "request.convert": {
+      "$ref": "#/components/schemas/RequestConvert"
+    },
+    "binding.inspect": {
+      "$ref": "#/components/schemas/BindingInspectionInput"
+    }
+  }
+}

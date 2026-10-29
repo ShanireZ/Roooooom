@@ -1,0 +1,37 @@
+{
+  "name": "roooooom-web",
+  "private": true,
+  "version": "0.1.0-dev",
+  "type": "module",
+  "packageManager": "npm@12.2.1",
+  "engines": {
+    "node": ">=24.22.1 <25",
+    "npm": "12.2.1"
+  },
+  "scripts": {
+    "api:generate": "node scripts/api-types.mjs",
+    "api:check": "node scripts/api-types.mjs --check",
+    "typecheck": "tsc --noEmit",
+    "test:unit": "vitest run",
+    "build": "vite build && node scripts/embed.mjs",
+    "test:e2e": "playwright test",
+    "test:go-embed": "go test ../internal/webui -count=1",
+    "verify": "node scripts/verify.mjs"
+  },
+  "dependencies": {
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@types/node": "24.19.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "openapi-typescript": "7.13.0",
+    "typescript": "5.9.3",
+    "vite": "8.3.5",
+    "vitest": "5.0.5"
+  },
+  "license": "GPL-3.0-only"
+}
