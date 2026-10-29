@@ -4,6 +4,7 @@ import {navigate} from '../../App';
 import {useI18n} from '../../i18n/I18nProvider';
 import {routePath,type TaskTab} from '../../shell/routes';
 import {Feedback} from '../../ui/Feedback';
+import {InkNav} from '../../ui/InkNav';
 import {Drawer} from '../Drawer';
 import {localizedSummary} from '../decision/systemQuestions';
 import {DiscussionTab} from './DiscussionTab';
@@ -41,9 +42,9 @@ export function TaskDrawer({projectId,taskId,tab}:{projectId:string;taskId:strin
    {tk.integratorId?<span className="muted">{t('task.responsible')}: {names[tk.integratorId]??t('seat.revoked')}</span>:null}
    <p className="next-step">{t(step.key,step.params)}</p>
   </div>
-  <nav className="drawer-tabs" aria-label={t('task.tabs')}>
+  <InkNav className="drawer-tabs" label={t('task.tabs')} current={shown}>
    {TABS.map(x=><a key={x} href={routePath({name:'room',projectId,drawer:{kind:'task',id:taskId,tab:x}})} data-local aria-current={x===shown?'page':undefined}>{t(('task.tab.'+x) as 'task.tab.overview')}</a>)}
-  </nav>
+  </InkNav>
   <Feedback error={task.error}/>
   {shown==='overview'?<OverviewTab task={tk}/>:shown==='work'?<WorkTab task={tk} names={names} fresh={task.fresh}/>:shown==='manage'?<ManageTab task={tk} names={names} people={people} fresh={task.fresh}/>:shown==='evidence'?<EvidenceTab task={tk} names={names}/>:shown==='discussion'?<DiscussionTab task={tk} names={names}/>:<HistoryTab task={tk}/>}
  </Drawer>;

@@ -8,6 +8,7 @@ import {JoinInstructions} from '../../setup/JoinInstructions';
 import {routePath,type SettingsSection} from '../../shell/routes';
 import {useRooms} from '../../shell/Shell';
 import {Feedback} from '../../ui/Feedback';
+import {InkNav} from '../../ui/InkNav';
 import {RelativeTime} from '../../ui/RelativeTime';
 import {useAction} from '../../ui/useAction';
 import {Drawer} from '../Drawer';
@@ -18,9 +19,9 @@ const SECTIONS:SettingsSection[]=['door','members','integrations'];
 export function RoomSettingsDrawer({projectId,section}:{projectId:string;section:SettingsSection}){
  const {t}=useI18n(),{rooms}=useRooms(),project=rooms.find(r=>r.id===projectId);
  return <Drawer title={t('settings.title')} onClose={()=>navigate(routePath({name:'room',projectId}))}>
-  <nav className="drawer-tabs" aria-label={t('settings.sections')}>
+  <InkNav className="drawer-tabs" label={t('settings.sections')} current={section}>
    {SECTIONS.map(s=><a key={s} href={routePath({name:'room',projectId,drawer:{kind:'settings',section:s}})} data-local aria-current={s===section?'page':undefined}>{t(('settings.'+s) as 'settings.door')}</a>)}
-  </nav>
+  </InkNav>
   {!project?null:section==='door'?<DoorSection project={project}/>:section==='members'?<MembersSection projectId={projectId}/>:<IntegrationsSection projectId={projectId}/>}
  </Drawer>;
 }

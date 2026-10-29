@@ -50,6 +50,7 @@ test('at 375 px tabs scroll in their own strip, truncated names keep their full 
  await page.getByRole('button',{name:m('shell.needsYou')}).click();
  const panel=page.locator('#needs-you-panel');
  await expect(panel).toBeVisible();
+ await panel.evaluate(el=>Promise.all(el.getAnimations().map(a=>a.finished)));
  expect(await panel.evaluate(el=>{const r=el.getBoundingClientRect();return [Math.round(r.width),Math.round(r.height)]})).toEqual([375,812]);
  await page.keyboard.press('Escape');
  await page.goto(service.origin+'/rooms/'+p.id+'/tasks/'+task.id);

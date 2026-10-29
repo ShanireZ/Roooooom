@@ -1,6 +1,7 @@
 import {useEffect,useRef,useState} from 'react';
 import {localizedSummary} from '../drawer/decision/systemQuestions';
 import {useI18n} from '../i18n/I18nProvider';
+import {useBump} from '../ui/motion';
 import {Stamp} from '../ui/Stamp';
 import {RelativeTime} from '../ui/RelativeTime';
 import {needsYouKey,needsYouPath,type NeedsYouItem} from './useNeedsYou';
@@ -21,10 +22,11 @@ export function NeedsYou({items,rooms}:{items:NeedsYouItem[];rooms:Room[]}){
   const timer=setTimeout(()=>{lastAnnounce.current=Date.now();setAnnounced(tn('needsYou.announce',items.length))},wait);
   return()=>clearTimeout(timer);
  },[items.length,tn]);
+ const bump=useBump(items.length);
  const groups=rooms.filter(r=>items.some(i=>i.projectId===r.id));
  return <>
   <button type="button" className="needs-button" popoverTarget="needs-you-panel" aria-expanded={open} aria-controls="needs-you-panel">
-   {t('shell.needsYou')}{items.length?<span className="count" aria-hidden="true">{items.length}</span>:null}<span className="sr-only">{tn('needsYou.items',items.length)}</span>
+   {t('shell.needsYou')}{items.length?<span key={bump} className={'count'+(bump?' pop':'')} aria-hidden="true">{items.length}</span>:null}<span className="sr-only">{tn('needsYou.items',items.length)}</span>
   </button>
   <span className="sr-only" aria-live="polite">{announced}</span>
   <div id="needs-you-panel" popover="auto" ref={panel} className="needs-panel">

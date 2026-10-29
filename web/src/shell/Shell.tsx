@@ -6,6 +6,8 @@ import type {Schema} from '../api/client';
 import {useCollection} from '../api/resource';
 import {useI18n} from '../i18n/I18nProvider';
 import {IconGear,IconPlus} from '../ui/icons';
+import {InkNav} from '../ui/InkNav';
+import {useBump} from '../ui/motion';
 import {Wordmark} from '../ui/Wordmark';
 import {ConnectionBanner,ConnectionIndicator} from './ConnectionBanner';
 import {NeedsYou} from './NeedsYou';
@@ -20,6 +22,14 @@ export function useRooms(){
  return {rooms,loaded:projects.data!==undefined,error:projects.error,refresh:projects.refresh};
 }
 
+// A room tab; its owner count pops when the number changes.
+function RoomTab({room,count,current}:{room:Project;count:number;current:boolean}){
+ const {tn}=useI18n(),bump=useBump(count);
+ return <a className="room-tab" href={'/rooms/'+room.id} data-local aria-current={current?'page':undefined}>
+  <span className="room-name" title={room.name}>{room.name}</span>{count?<><span key={bump} className={'count'+(bump?' pop':'')} aria-hidden="true">{count}</span><span className="sr-only">, {tn('needsYou.items',count)}</span></>:null}
+ </a>;
+}
+
 export function Shell({route,retry,busy,children}:{route:Route;retry:()=>void;busy:boolean;children:ReactNode}){
  const {t,tn}=useI18n(),{rooms}=useRooms();
  const order=useMemo(()=>rooms.map(r=>r.id),[rooms]);
@@ -28,12 +38,10 @@ export function Shell({route,retry,busy,children}:{route:Route;retry:()=>void;bu
  return <div className="rm">
   <header className="shell-bar">
    <Wordmark/>
-   <nav className="room-tabs" aria-label={t('shell.rooms')}>
-    {rooms.map(room=>{const count=needs.byProject[room.id]?.length??0;return <a key={room.id} className="room-tab" href={'/rooms/'+room.id} data-local aria-current={room.id===active?'page':undefined}>
-     <span className="room-name" title={room.name}>{room.name}</span>{count?<><span className="count" aria-hidden="true">{count}</span><span className="sr-only">, {tn('needsYou.items',count)}</span></>:null}
-    </a>})}
+   <InkNav className="room-tabs" label={t('shell.rooms')} current={(active??'')+'|'+rooms.map(r=>r.name).join('|')}>
+    {rooms.map(room=><RoomTab key={room.id} room={room} count={needs.byProject[room.id]?.length??0} current={room.id===active}/>)}
     <a className="room-tab room-new" href="/rooms/new" data-local title={t('shell.newRoom')}><IconPlus/><span className="sr-only">{t('shell.newRoom')}</span></a>
-   </nav>
+   </InkNav>
    <div className="topbar-end">
     <ConnectionIndicator/>
     <NeedsYou items={needs.items} rooms={rooms}/>

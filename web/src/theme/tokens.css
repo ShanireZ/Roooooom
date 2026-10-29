@@ -1,12 +1,19 @@
-/* Blueprint tokens (docs/ui-design.md §10). Only lightness may change, and only to reach WCAG AA.
-   Text on owner and danger fills uses --on-owner / --on-danger so each theme keeps AA. */
+/* Refined blueprint tokens (docs/ui-design.md §10). Every text pair meets WCAG AA in both
+   themes; text on owner and danger fills uses --on-owner / --on-danger. */
 :root{
- --paper:#f6f3ea;--paper-2:#efeadc;--ink:#1d3557;--ink-muted:#4b5b76;--grid:#1d355714;
- --active:#457b9d;--owner:#c2410c;--owner-bg:#fff4ec;--danger:#9f1239;--note:#fffbe6;--on-ink:#f6f3ea;--on-owner:#ffffff;--on-danger:#ffffff;
+ --paper:#f3efe4;--paper-2:#e9e3d3;--sheet:#fbf8f1;--ink:#13284a;--ink-muted:#4b5b76;--ink-2:#13284a59;--grid:#13284a0f;
+ --active:#356a8f;--owner:#c2410c;--owner-bg:#fcefe4;--danger:#9f1239;--note:#fff4cf;--fresh:#e3edf7;
+ --on-ink:#fbf8f1;--on-owner:#ffffff;--on-danger:#ffffff;--shadow:#13284a2e;--shadow-strong:#13284a55;
  --agent-0:#0f766e;--agent-1:#4338ca;--agent-2:#a21caf;--agent-3:#4d7c0f;--agent-4:#0369a1;--agent-5:#6d28d9;--on-agent:#ffffff;
  --font-body:"Segoe UI",system-ui,sans-serif;
  --font-mono:"Cascadia Mono","JetBrains Mono",Consolas,ui-monospace,monospace;
- --rule:1.5px;--lift:4px;--radius:2px;
+ /* One type scale: 26/20/17 headings, 15 body, 13 secondary, 12 mono, 11 labels. */
+ --fs-label:11px;--fs-mono:12px;--fs-sm:13px;--fs-md:15px;--fs-lg:17px;--fs-xl:20px;--fs-2xl:26px;
+ --sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-5:24px;--sp-6:32px;
+ --rule:1.5px;--hair:1px;--radius:2px;--lift:3px;--lift-2:6px;--bar-h:54px;
+ /* Motion: quick for hover/press/exits, base for entrances, shape for moves, fill for progress. */
+ --dur-quick:120ms;--dur-base:180ms;--dur-shape:280ms;--dur-fill:440ms;--dur-ink:1.6s;
+ --ease-out:cubic-bezier(.2,.75,.2,1);--ease-in:cubic-bezier(.55,0,.8,.2);--ease-stamp:cubic-bezier(.3,1.35,.5,1);
  color-scheme:light;
 }
 :root:lang(zh-TW){--font-body:"Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif}
@@ -14,15 +21,17 @@
 :root:lang(ja){--font-body:"Yu Gothic UI","Hiragino Sans","Noto Sans JP",sans-serif}
 @media (prefers-color-scheme:dark){
  :root:not([data-theme=light]){
-  --paper:#0f1b2d;--paper-2:#142540;--ink:#d7e3f4;--ink-muted:#d7e3f4ab;--grid:#d7e3f414;
-  --active:#7fb3d5;--owner:#f59e0b;--owner-bg:#2a1d08;--danger:#fb7185;--note:#2e2a17;--on-ink:#0f1b2d;--on-owner:#1b1203;--on-danger:#2b0a13;
-  --agent-0:#2dd4bf;--agent-1:#a5b4fc;--agent-2:#f0abfc;--agent-3:#bef264;--agent-4:#7dd3fc;--agent-5:#c4b5fd;--on-agent:#0f1b2d;
+  --paper:#0c1626;--paper-2:#111f35;--sheet:#15253d;--ink:#dce7f6;--ink-muted:#9fb1ca;--ink-2:#dce7f654;--grid:#dce7f60d;
+  --active:#7fb3d5;--owner:#f59e0b;--owner-bg:#2a1d08;--danger:#fb7185;--note:#2e2915;--fresh:#1d3555;
+  --on-ink:#0c1626;--on-owner:#1b1203;--on-danger:#2b0a13;--shadow:#00000066;--shadow-strong:#000000a0;
+  --agent-0:#2dd4bf;--agent-1:#a5b4fc;--agent-2:#f0abfc;--agent-3:#bef264;--agent-4:#7dd3fc;--agent-5:#c4b5fd;--on-agent:#0c1626;
   color-scheme:dark;
  }
 }
 :root[data-theme=dark]{
- --paper:#0f1b2d;--paper-2:#142540;--ink:#d7e3f4;--ink-muted:#d7e3f4ab;--grid:#d7e3f414;
- --active:#7fb3d5;--owner:#f59e0b;--owner-bg:#2a1d08;--danger:#fb7185;--note:#2e2a17;--on-ink:#0f1b2d;--on-owner:#1b1203;--on-danger:#2b0a13;
- --agent-0:#2dd4bf;--agent-1:#a5b4fc;--agent-2:#f0abfc;--agent-3:#bef264;--agent-4:#7dd3fc;--agent-5:#c4b5fd;--on-agent:#0f1b2d;
+ --paper:#0c1626;--paper-2:#111f35;--sheet:#15253d;--ink:#dce7f6;--ink-muted:#9fb1ca;--ink-2:#dce7f654;--grid:#dce7f60d;
+ --active:#7fb3d5;--owner:#f59e0b;--owner-bg:#2a1d08;--danger:#fb7185;--note:#2e2915;--fresh:#1d3555;
+ --on-ink:#0c1626;--on-owner:#1b1203;--on-danger:#2b0a13;--shadow:#00000066;--shadow-strong:#000000a0;
+ --agent-0:#2dd4bf;--agent-1:#a5b4fc;--agent-2:#f0abfc;--agent-3:#bef264;--agent-4:#7dd3fc;--agent-5:#c4b5fd;--on-agent:#0c1626;
  color-scheme:dark;
 }

@@ -139,25 +139,25 @@ Each item shows its stamp (§10.4), a one-line plain summary, what it blocks, an
 +-----------------------------------------------------------+------------------+
 | DOOR      | FLOOR: open task tables              | CABINET | ACTIVITY         |
 | request   |  [table] [table] [table]             |  done   | feed + filters   |
-| notes     |  [table] [+ ask agents to do ...]    |  count  |                  |
-|           | LOBBY: members without open work     |         | composer         |
+| notes     |  [table] [+ ask agents to do ...]    | ------- |                  |
+|           |                                      | LOBBY   | composer         |
 +-----------------------------------------------------------+------------------+
 ```
 
 - **Door**: requests in `waiting` (no preparer) and `preparing` (the preparer's seat shown on the note). Converted requests leave the door: the note becomes a table, with a short transition when motion is allowed. Cancelled requests appear only in the archive.
 - **Floor**: tasks in `ready`, `active`, `integrating` and `review`. A permanent dashed **+ Ask agents to do something** table opens the request composer.
 - **File cabinet**: count of `done` tasks plus the three most recent goals. It opens the archive drawer, which lists done and cancelled tasks and cancelled requests with text search and a status filter.
-- **Lobby**: room participants who hold no open responsibility, with their last synchronization time. Revoked participants never appear in the lobby or the members list, because revocation removes their project membership. A seat that still references a revoked participant shows "Revoked agent" with the short identifier and carries the ⚠ blocker flag.
+- **Lobby**: below the cabinet in the same column; room participants who hold no open responsibility, with their last synchronization time. Revoked participants never appear in the lobby or the members list, because revocation removes their project membership. A seat that still references a revoked participant shows "Revoked agent" with the short identifier and carries the ⚠ blocker flag.
 - **Activity**: the room feed (§7.5).
 
 ### 7.2 Tables
 
-A table shows:
+A table is a sheet about 1.6:1 (at least 168 px tall) and shows:
 
 - the goal (wrapped to three lines, then truncated with the full text available);
 - the phase in plain words;
 - a segmented progress bar with one segment per assignment, colored by state: accepted, in progress, waiting for the owner, blocked by dependency, or open. A task without assignments shows a single segment for the integration state;
-- seats.
+- seats, inside the table along its bottom edge, so tables in one row line up.
 
 **Seats** appear once per participant per table, never once per assignment. This matches the collaborator rule in DESIGN.md §5 that one participant never counts twice. Each seat shows the agent color and initials, a role label (`integrating` outranks a worker role; a worker seat shows its assignment role or `delivered`), and the last synchronization time as relative text. Same-name participants add the short identifier used today.
 
@@ -318,20 +318,27 @@ The duplicate "advanced project registration" form is dropped; `/rooms/new` with
 
 ## 10. Visual system
 
-### 10.1 Palette (accepted)
+The refined blueprint revision, approved by the owner on 2026-10-29 from an interactive sketch in local evidence, replaces the first palette and adds explicit scales. The blueprint metaphor stays: grid paper on the floor, ink rules, stamps and per-agent colors.
+
+### 10.1 Palette
 
 | Token | Light | Dark | Use |
 | --- | --- | --- | --- |
-| paper | `#f6f3ea` | `#0f1b2d` | page and floor |
-| paper-2 | `#efeadc` | `#142540` | top bar, raised areas |
-| ink | `#1d3557` | `#d7e3f4` | text, rules, primary buttons |
-| ink-muted | ink at 67% | ink at 67% | secondary text (must still meet AA) |
-| grid | ink at 8% | ink at 8% | floor grid only |
-| active | `#457b9d` | `#7fb3d5` | in-progress segments |
+| paper | `#f3efe4` | `#0c1626` | page and floor |
+| paper-2 | `#e9e3d3` | `#111f35` | top bar, composer, drawer footer |
+| sheet | `#fbf8f1` | `#15253d` | tables, panels, drawers and popovers |
+| ink | `#13284a` | `#dce7f6` | text, rules, primary buttons |
+| ink-muted | `#4b5b76` | `#9fb1ca` | secondary text (solid, AA on paper and sheet) |
+| ink-2 | ink at 35% | ink at 33% | hairlines and inactive segments |
+| grid | ink at 6% | ink at 5% | floor grid only |
+| active | `#356a8f` | `#7fb3d5` | in-progress segments |
 | owner (warning) | `#c2410c` | `#f59e0b` | **only** items that need the owner |
-| owner-bg | `#fff4ec` | `#2a1d08` | owner item backgrounds |
+| on-owner | `#ffffff` | `#1b1203` | text on owner fills |
+| owner-bg | `#fcefe4` | `#2a1d08` | owner item backgrounds |
 | danger | `#9f1239` | `#fb7185` | cancel, revoke and other destructive actions |
-| note | `#fffbe6` | `#2e2a17` | door notes |
+| on-danger | `#ffffff` | `#2b0a13` | text on danger fills |
+| note | `#fff4cf` | `#2e2915` | door notes |
+| fresh | `#e3edf7` | `#1d3555` | a just-arrived entry, fading out |
 
 Agent colors, light and dark: teal `#0f766e`/`#2dd4bf`, indigo `#4338ca`/`#a5b4fc`, fuchsia `#a21caf`/`#f0abfc`, olive `#4d7c0f`/`#bef264`, cerulean `#0369a1`/`#7dd3fc`, violet `#6d28d9`/`#c4b5fd`.
 
@@ -339,6 +346,7 @@ Agent colors, light and dark: teal `#0f766e`/`#2dd4bf`, indigo `#4338ca`/`#a5b4f
 - Collisions are expected and acceptable: initials and same-name identifiers remain the identity.
 - Agent colors never use the owner or danger hues.
 - The builder may adjust lightness only to reach WCAG AA (4.5:1 for text on chips, 3:1 for non-text marks). Hue and purpose stay.
+- Every text pair meets WCAG AA in both themes. A browser test measures the owner button, count badges, labels, secondary text and danger buttons in light and dark mode.
 
 ### 10.2 Typography
 
@@ -351,24 +359,37 @@ System fonts only; no embedded font files.
 | zh-CN | `"Microsoft YaHei", "PingFang SC", "Noto Sans SC", sans-serif` |
 | ja | `"Yu Gothic UI", "Hiragino Sans", "Noto Sans JP", sans-serif` |
 
-- Labels, times, counts and statuses use `"Cascadia Mono", "JetBrains Mono", Consolas, ui-monospace` in uppercase Latin. CJK labels use the body stack, never monospace.
+- One type scale, nothing else: 26/700 page title, 20/700 drawer title, 17/700 table title and section lead, 15 body and buttons, 13 secondary text and feed, 12 mono times, counts and identifiers, 11 mono uppercase labels and stamps.
+- Labels, times, counts and statuses use `"Cascadia Mono", "JetBrains Mono", Consolas, ui-monospace` in uppercase Latin. CJK labels use the body stack, never monospace or uppercase.
 - `<html lang>` always matches the UI locale, so the browser picks the correct regional Han glyphs.
 - Agent- or owner-authored blocks get `lang` only when the language is known; otherwise they inherit.
 
-### 10.3 Shape and motion
+### 10.3 Space, rules and layers
 
-- Rules: 1.5 px ink lines, square or 2 px corners.
-- A hard offset shadow (3–5 px of ink) marks raised, selected or focused elements.
-- Dashed outlines mean empty, provisional, or stale.
-- A double rule marks the door.
-- The grid paper appears only on the floor; drawers and forms use plain paper.
+- Spacing steps: 4, 8, 12, 16, 24 and 32 px.
+- Rules: 1.5 px ink for primary lines, 1 px ink-2 for separators. Dashed outlines mean empty, provisional or stale. A double rule marks the door.
+- Layers: grid paper only on the floor; tables, notes and panels are sheets with a 3 px hard offset shadow; drawers and popovers are sheets with a 6 px shadow. Hovering a table, note or button lifts it 2 px with a 5 px shadow; pressing sinks it 1 px.
+- Corners are 2 px; seats and filter chips are pills.
+- Stamps keep one size everywhere (11 px mono, 2 px border). On a table edge they tilt by −1.5°; in lists and drawer headers they sit level.
 - Focus: a visible ink outline with offset.
-- Drawers and popovers animate in 120–200 ms with ease-out. A converted note morphs into its table.
-- With `prefers-reduced-motion`, there are no transitions, pulses or morphs.
 - Icons: a small inline-SVG stroke set matching the rule weight; no icon font.
 - Wordmark: `ROOOOOOM` in the mono stack, plus a simple door or floor-plan mark. Both are the builder's design within these rules.
 
-### 10.4 Stamps
+### 10.4 Motion
+
+| Step | Duration | Use |
+| --- | --- | --- |
+| quick | 120 ms | hover, press, color changes and every exit |
+| base | 180 ms | drawer and popover entrances, content crossfades |
+| shape | 280 ms | note-to-table morph, floor reorder, seat joins and leaves, tab indicator, stamp landing, room column resize |
+| fill | 440 ms | progress segments |
+| ink | 1.6 s | the highlight on a just-arrived feed entry as it fades |
+
+- Entrances ease out; exits are shorter and ease in; stamps land with a slight overshoot. Count badges pop when their number changes. Loading shows dashed placeholder tables with a slow scan.
+- The morph, reorder, seat changes and tab or view switches use same-document view transitions; a browser without them applies the change instantly.
+- With `prefers-reduced-motion`, every transition, animation and view transition is off, and state still updates immediately.
+
+### 10.5 Stamps
 
 Stamps always pair text with an outline, so color never carries meaning alone.
 
@@ -428,7 +449,7 @@ Stamps always pair text with an outline, so color never carries meaning alone.
 
 ## 13. Responsive behavior
 
-- **1200 px and wider**: floor and activity sit side by side. The drawer overlays the activity column.
+- **1200 px and wider**: floor and activity sit side by side, and the floor fills the window height. Opening a drawer widens the right column to the drawer (540 px) in place of the activity column and folds the cabinet and lobby column, so the floor reflows instead of being covered.
 - **760–1199 px**: a Floor | Activity switch replaces the side column. The drawer overlays about 70% of the width.
 - **Below 760 px**: everything stacks.
   - Room tabs become a horizontal scroller.

@@ -3,8 +3,8 @@ package identity
 // ServerPageCSS styles the service-rendered activation and expired pages in the
 // blueprint system. The activation file inlines it because its CSP forbids any
 // fetch; the expired page links the identical web/public/assets/server-pages.css.
-const ServerPageCSS = `:root{color-scheme:light dark;--paper:#f6f3ea;--ink:#1d3557;--muted:#1d3557ab;--grid:#1d355714}
-@media (prefers-color-scheme:dark){:root{--paper:#0f1b2d;--ink:#d7e3f4;--muted:#d7e3f4ab;--grid:#d7e3f414}}
+const ServerPageCSS = `:root{color-scheme:light dark;--paper:#f3efe4;--ink:#13284a;--muted:#4b5b76;--grid:#13284a0f}
+@media (prefers-color-scheme:dark){:root{--paper:#0c1626;--ink:#dce7f6;--muted:#9fb1ca;--grid:#dce7f60d}}
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;background-color:var(--paper);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:16px 16px;color:var(--ink);font:16px/1.7 "Segoe UI",system-ui,sans-serif}
 html:lang(zh-TW) body{font-family:"Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif}

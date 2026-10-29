@@ -18,9 +18,9 @@ export function useSeatLabels(){
  return {name,role,sync,title};
 }
 // A seat is a button: selecting it focuses the room on that member's work.
-export function Seat({seat,pressed,onSelect,compact=false}:{seat:SeatModel;pressed:boolean;onSelect:(participantId:string)=>void;compact?:boolean}){
+export function Seat({seat,pressed,onSelect,compact=false,entering=false}:{seat:SeatModel;pressed:boolean;onSelect:(participantId:string)=>void;compact?:boolean;entering?:boolean}){
  const labels=useSeatLabels();
- return <button type="button" className="seat" data-stale={String(seat.stale||seat.ended)} aria-pressed={pressed} title={labels.title(seat)} onClick={()=>onSelect(seat.participantId)}>
+ return <button type="button" className={'seat'+(entering?' join':'')} data-stale={String(seat.stale||seat.ended)} aria-pressed={pressed} title={labels.title(seat)} onClick={()=>onSelect(seat.participantId)}>
   <span className="avatar" style={{background:`var(--agent-${seat.color})`}} aria-hidden="true">{seat.revoked?'?':initials(seat.name)}</span>
   <span className="seat-name" title={labels.name(seat)}>{labels.name(seat)}</span>
   {seat.role?<span className="seat-role">{labels.role(seat)}</span>:null}

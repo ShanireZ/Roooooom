@@ -42,11 +42,14 @@ export function RoomPage({projectId,name,drawer}:{projectId:string;name:string;d
     <div className="floor-col">
      <h2 className="label">{t('room.floor')}</h2>
      {room.loaded&&!floor.tables.length&&!floor.notes.length?<p className="muted empty-floor">{t('room.emptyFloor')}</p>:null}
-     <Floor tables={floor.tables} projectId={projectId} compact={floor.density==='compact'} focusedMember={focusedMember} onSelectMember={select} onAsk={ask}/>
+     {room.loaded?<Floor tables={floor.tables} projectId={projectId} compact={floor.density==='compact'} focusedMember={focusedMember} onSelectMember={select} onAsk={ask}/>
+      :<ul className="tables" aria-hidden="true">{[0,1,2].map(i=><li key={i} className="table-item skeleton"/>)}</ul>}
     </div>
-    <div className="cabinet-col"><Cabinet cabinet={floor.cabinet} projectId={projectId}/></div>
+    <div className="side-col">
+     <Cabinet cabinet={floor.cabinet} projectId={projectId}/>
+     <Lobby members={floor.lobby} anyMembers={room.participants.length>0} projectId={projectId} focusedMember={focusedMember} onSelectMember={select}/>
+    </div>
    </div>
-   <Lobby members={floor.lobby} anyMembers={room.participants.length>0} projectId={projectId} focusedMember={focusedMember} onSelectMember={select}/>
   </div>
   <aside className="room-activity">
    <Activity projectId={projectId}/>

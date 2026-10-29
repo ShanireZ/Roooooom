@@ -13,7 +13,7 @@ export type FloorInput={
 // `name` is empty for revoked participants; the view renders the catalog label.
 export type Seat={participantId:string;name:string;shortId:string;showShortId:boolean;color:AgentColor;role:'integrating'|'delivered'|string;lastSeenAt:string;stale:boolean;ended:boolean;revoked:boolean};
 export type TableFlag='decision'|'acceptance'|'blocker';
-export type Table={taskId:string;goal:string;phase:string;segments:Segment[];seats:Seat[];flags:TableFlag[];waitingForAgent:boolean;waitingOnDependencies:boolean;updatedAt:string};
+export type Table={taskId:string;sourceRequestId?:string;goal:string;phase:string;segments:Segment[];seats:Seat[];flags:TableFlag[];waitingForAgent:boolean;waitingOnDependencies:boolean;updatedAt:string};
 export type Note={requestId:string;text:string;state:'waiting'|'preparing';preparer?:Seat;flagged:boolean};
 export type FloorModel={notes:Note[];tables:Table[];density:'comfortable'|'compact';cabinet:{doneCount:number;recent:{taskId:string;goal:string}[]};lobby:Seat[]};
 
@@ -48,7 +48,7 @@ export function buildFloor({tasks,requests,assignments,participants,sessions,nee
   }
   const segments:Segment[]=work.length?work.map(a=>a.state==='accepted'?'accepted':a.state==='open'?'open':!a.canStart&&a.state!=='submitted'?(flags.includes('decision')?'owner':'blocked'):'active')
    :[flags.length?'owner':!t.integratorId?'open':'active'];
-  return {taskId:t.id,goal:t.goal,phase:t.phase,segments,seats,flags,waitingForAgent:!t.integratorId,waitingOnDependencies:!!t.integratorId&&!t.canStart&&!flags.length,updatedAt:t.updatedAt??''};
+  return {taskId:t.id,sourceRequestId:t.sourceRequestId,goal:t.goal,phase:t.phase,segments,seats,flags,waitingForAgent:!t.integratorId,waitingOnDependencies:!!t.integratorId&&!t.canStart&&!flags.length,updatedAt:t.updatedAt??''};
  });
  const created=new Map(tasks.map(t=>[t.id,time(t.createdAt)]));
  const rank=(t:Table)=>t.flags.length?0:t.phase==='ready'?2:1;
