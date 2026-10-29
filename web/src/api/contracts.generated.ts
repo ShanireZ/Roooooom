@@ -1037,6 +1037,11 @@ export interface components {
             dataDir: string;
             serviceURL: string;
         };
+        /** @description Human cookie + Origin + CSRF only. Sets the owner language used by the browser, activation page, tray and notifications; an empty value clears it. Grants no authority and is not readable by agents. */
+        OwnerLanguage: {
+            /** @enum {string} */
+            language: "" | "en" | "zh-CN" | "zh-TW" | "ja";
+        };
     };
     responses: never;
     parameters: never;
@@ -1086,7 +1091,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Authenticated actor; CSRF returned only to same-origin owner cookie session */
+            /** @description Authenticated actor; CSRF, ownerLanguage and build information returned only to the same-origin owner cookie session */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -1137,7 +1142,7 @@ export interface operations {
                 "X-CSRF-Token"?: string;
             };
             path: {
-                kind: "project.create" | "enrollment.enable" | "participant.revoke" | "task.create" | "integrator.claim" | "assignment.create" | "assignment.claim" | "assignment.release" | "assignment.update" | "collaborator.limit" | "task.reopen" | "task.cancel" | "session.checkpoint" | "session.end" | "session.resume" | "integrator.handoff" | "message.send" | "receipt.update" | "decision.request" | "decision.resolve" | "decision.supersede" | "decision.withdraw" | "decision.followup" | "delivery.submit" | "delivery.review" | "integration.record" | "acceptance.policy" | "acceptance.candidate" | "acceptance.accept" | "task.complete" | "offline.reconcile" | "offline.resolve" | "backup.create" | "backup.export" | "participant.recover" | "binding.create" | "binding.disable" | "binding.retry" | "binding.credential" | "binding.rotate" | "request.create" | "request.claim" | "request.release" | "request.handoff" | "request.accept" | "request.resume" | "request.assign" | "request.cancel" | "request.convert" | "binding.inspect";
+                kind: "project.create" | "enrollment.enable" | "participant.revoke" | "task.create" | "integrator.claim" | "assignment.create" | "assignment.claim" | "assignment.release" | "assignment.update" | "collaborator.limit" | "task.reopen" | "task.cancel" | "session.checkpoint" | "session.end" | "session.resume" | "integrator.handoff" | "message.send" | "receipt.update" | "decision.request" | "decision.resolve" | "decision.supersede" | "decision.withdraw" | "decision.followup" | "delivery.submit" | "delivery.review" | "integration.record" | "acceptance.policy" | "acceptance.candidate" | "acceptance.accept" | "task.complete" | "offline.reconcile" | "offline.resolve" | "backup.create" | "backup.export" | "participant.recover" | "binding.create" | "binding.disable" | "binding.retry" | "binding.credential" | "binding.rotate" | "request.create" | "request.claim" | "request.release" | "request.handoff" | "request.accept" | "request.resume" | "request.assign" | "request.cancel" | "request.convert" | "binding.inspect" | "owner.language";
             };
             cookie?: never;
         };

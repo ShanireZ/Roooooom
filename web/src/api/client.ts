@@ -2,7 +2,7 @@ import type {components} from './contracts.generated';
 export type Schema=components['schemas'];
 export type Envelope<T>=Omit<Schema['Envelope'],'result'> & {result:T};
 export type Identity=Schema['Identity'];
-export type OwnerContext={identity:Identity;csrf:string;actorKind:string};
+export type OwnerContext={identity:Identity;csrf:string;actorKind:string;ownerLanguage:string;build:Record<string,unknown>};
 export class ApiError extends Error{
  constructor(public code:string,public status:number){super(code)}
 }
@@ -57,9 +57,9 @@ export async function initializeOwner():Promise<OwnerContext>{
  const identity=await response.json() as Identity;
  if(!response.ok||identity.status!=='ok'||identity.protocolVersion!==1)throw new ApiError('service-mismatch',409);
  if(owner&&owner.identity.serviceId!==identity.serviceId){clearOwner();throw new ApiError('service-mismatch',409)}
- const me=await apiRequest<{actorKind:string;csrf?:string}>('/api/v1/me');
+ const me=await apiRequest<{actorKind:string;csrf?:string;ownerLanguage?:string;build?:Record<string,unknown>}>('/api/v1/me');
  if(me.result.actorKind!=='human'||!me.result.csrf){clearOwner();throw new ApiError('owner-required',403)}
- owner={identity,csrf:me.result.csrf,actorKind:'human'};
+ owner={identity,csrf:me.result.csrf,actorKind:'human',ownerLanguage:me.result.ownerLanguage??'',build:me.result.build??{}};
  return owner;
 }
 export async function command<T>(kind:string,payload:unknown,targetId?:string,versions:Partial<Schema['Mutation']>={}):Promise<Envelope<T>>{

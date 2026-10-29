@@ -57,7 +57,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Authenticated actor; CSRF returned only to same-origin owner cookie session",
+            "description": "Authenticated actor; CSRF, ownerLanguage and build information returned only to the same-origin owner cookie session",
             "content": {
               "application/json": {
                 "schema": {
@@ -180,7 +180,8 @@
                 "request.assign",
                 "request.cancel",
                 "request.convert",
-                "binding.inspect"
+                "binding.inspect",
+                "owner.language"
               ]
             }
           },
@@ -4463,6 +4464,26 @@
           "dataDir",
           "serviceURL"
         ]
+      },
+      "OwnerLanguage": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "language"
+        ],
+        "properties": {
+          "language": {
+            "type": "string",
+            "enum": [
+              "",
+              "en",
+              "zh-CN",
+              "zh-TW",
+              "ja"
+            ]
+          }
+        },
+        "description": "Human cookie + Origin + CSRF only. Sets the owner language used by the browser, activation page, tray and notifications; an empty value clears it. Grants no authority and is not readable by agents."
       }
     }
   },
@@ -4657,6 +4678,9 @@
     },
     "binding.inspect": {
       "$ref": "#/components/schemas/BindingInspectionInput"
+    },
+    "owner.language": {
+      "$ref": "#/components/schemas/OwnerLanguage"
     }
   }
 }

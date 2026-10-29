@@ -7,6 +7,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"roooooom.local/roooooom/internal/buildinfo"
 	"roooooom.local/roooooom/internal/control"
 	"roooooom.local/roooooom/internal/coordinator"
 	"roooooom.local/roooooom/internal/identity"
@@ -164,6 +165,13 @@ func (a *api) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			result["csrf"] = csrf
+			language, e := a.core.OwnerLanguage(r.Context())
+			if e != nil {
+				fail(w, e)
+				return
+			}
+			result["ownerLanguage"] = language
+			result["build"] = buildinfo.Current()
 		}
 		a.respond(w, result)
 		return
@@ -268,6 +276,8 @@ func (a *api) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		var receipt model.Receipt
 		if kind == "enrollment.enable" || kind == "participant.revoke" || kind == "participant.recover" {
 			receipt, e = a.identities.Control(r.Context(), actor, c)
+		} else if kind == "owner.language" {
+			receipt, e = a.core.Preferences(r.Context(), actor, c)
 		} else if kind == "backup.create" || kind == "backup.export" {
 			receipt, e = a.core.Maintenance(r.Context(), actor, c)
 		} else if strings.HasPrefix(kind, "binding.") {
@@ -288,7 +298,7 @@ func ownerOnly(kind string) bool {
 	if kind == "request.create" || kind == "request.cancel" || kind == "request.assign" {
 		return true
 	}
-	return strings.HasPrefix(kind, "project.") || strings.HasPrefix(kind, "enrollment.") || strings.HasPrefix(kind, "participant.") || strings.HasPrefix(kind, "binding.") || strings.HasPrefix(kind, "backup.") || kind == "decision.resolve" || kind == "decision.supersede" || kind == "decision.withdraw" || kind == "service.stop"
+	return strings.HasPrefix(kind, "owner.") || strings.HasPrefix(kind, "project.") || strings.HasPrefix(kind, "enrollment.") || strings.HasPrefix(kind, "participant.") || strings.HasPrefix(kind, "binding.") || strings.HasPrefix(kind, "backup.") || kind == "decision.resolve" || kind == "decision.supersede" || kind == "decision.withdraw" || kind == "service.stop"
 }
 func (a *api) authenticate(r *http.Request) (model.Actor, string, bool, error) {
 	token := ""
