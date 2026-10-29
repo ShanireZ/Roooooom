@@ -17,3 +17,14 @@
 .rm .record-list{list-style:none;margin:0;padding:0}
 .rm .record-list>li{padding:8px 0;border-bottom:1px dashed var(--ink-muted);overflow-wrap:anywhere}
 .rm .message-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline;font-size:12px}
+.rm .option-card{align-items:flex-start;padding:10px 12px;margin-bottom:8px;border:var(--rule) solid var(--ink-muted);background:var(--paper)}
+.rm .option-card:has(input:checked){border-color:var(--ink);box-shadow:3px 3px 0 var(--ink)}
+.rm .option-card input{margin-top:3px}
+.rm .option-card small{display:block;color:var(--ink-muted);font-size:12px}
+.rm .rec-tag{margin-inline-start:6px;padding:0 5px;font:700 10px/1.6 var(--font-mono);text-transform:uppercase;background:var(--ink);color:var(--on-ink)}
+.rm .recommendation{border-inline-start:3px solid var(--ink-muted);padding:4px 10px;font-size:14px}
+.rm .formal-answer{border-inline-start:3px solid var(--owner);background:var(--owner-bg);padding:10px 12px;margin:10px 0}
+.rm .approve-also{margin:14px 0;padding:12px;border:2px solid var(--owner)}
+.rm .approve-also h3{font-size:14px;color:var(--owner)}
+.rm .inset{border-top:1px dashed var(--ink-muted);padding-top:10px;margin-top:6px}
+.rm .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
