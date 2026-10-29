@@ -7,7 +7,7 @@ function run(binary,args,cwd){
  const result=spawnSync(binary,args,{cwd,windowsHide:true,stdio:'inherit'});
  if(result.status!==0)process.exit(result.status??1);
 }
-for(const task of ['api:check','typecheck','test:unit','build'])npm(task);
+for(const task of ['api:check','typecheck','i18n:check','test:unit','build'])npm(task);
 run('go',['test','./...','-count=1'],root);
 run('go',['vet','./...'],root);
 npm('test:e2e');
