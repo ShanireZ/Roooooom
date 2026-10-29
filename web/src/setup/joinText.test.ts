@@ -3,7 +3,7 @@ import {createTranslator,LOCALES} from '../i18n/translator';
 import {joinInstructions} from './joinText';
 
 const project={id:'proj-123',name:'SimpleProject',repositories:[{id:'r1',name:'main',reference:'C:\\Projects\\SimpleProject'}]} as Parameters<typeof joinInstructions>[1]['project'];
-const info={clientPath:'C:\\Program Files\\Roooooom\\roooooom.exe',skillPath:'C:\\Program Files\\Roooooom\\skills\\roooooom\\SKILL.md',dataDir:'C:\\Users\\me\\AppData\\Roooooom',serviceURL:'http://127.0.0.1:7337'};
+const info={clientPath:'C:\\Program Files\\Roooooom\\roooooom.exe',skillPath:'C:\\Program Files\\Roooooom\\skills\\roooooom\\SKILL.md',dataDir:'C:\\ProgramData\\Roooooom\\data',serviceURL:'http://127.0.0.1:7337'};
 
 describe('joinInstructions',()=>{
  it('contains the project id, skill path and connect command in every locale, without backslashes',()=>{
