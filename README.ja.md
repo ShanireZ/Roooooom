@@ -28,7 +28,7 @@ agent の起動・呼び出し、各社 CLI／IDE／desktop の管理、hooks �
 
 ## ビルドと試用
 
-Go 1.27.3、Node.js 24.22.1、npm 12.2.1 を使用します。Windows amd64 の例：
+Go 1.27.3、Node.js 26.13.0、npm 12.2.1 を使用します。Windows amd64 の例：
 
 ```powershell
 git clone https://github.com/ShanireZ/Roooooom.git

@@ -73,7 +73,7 @@ export function summarize(report) {
 // These are schema fixtures. They never claim that this test operated real hosts/platforms.
 function completeFixture() {
   const sha = 'a'.repeat(64), commit = 'b'.repeat(40);
-  const r = {format:1, commit, toolchain:{go:'go1.27.3', node:'v24.22.1', npm:'12.2.1'},
+  const r = {format:1, commit, toolchain:{go:'go1.27.3', node:'v26.13.0', npm:'12.2.1'},
     lockHashes:{'go.mod':sha,'go.sum':sha,'web/package-lock.json':sha},
     environment:{os:'Windows 11',arch:'amd64',cpu:'redacted CPU model',browser:'Chromium'},
     bundle:{target:'windows-amd64',sha256:sha,sourceFingerprint:sha,commit,dirty:false},

@@ -28,7 +28,7 @@
 
 ## 建置與試用
 
-建置需要 Go 1.27.3、Node.js 24.22.1、npm 12.2.1。Windows amd64 範例：
+建置需要 Go 1.27.3、Node.js 26.13.0、npm 12.2.1。Windows amd64 範例：
 
 ```powershell
 git clone https://github.com/ShanireZ/Roooooom.git

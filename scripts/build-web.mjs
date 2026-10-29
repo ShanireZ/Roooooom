@@ -2,7 +2,7 @@ import {mkdir} from 'node:fs/promises';
 import {join} from 'node:path';
 import {ROOT,args,run,npmCLI,webInputs,inventory,hash,writeJSON} from './lib/packaging.mjs';
 export async function buildWeb(install=true){
- if(process.version!=='v24.22.1')throw Error('Build requires Node v24.22.1');
+ if(process.version!=='v26.13.0')throw Error('Build requires Node v26.13.0');
  if(install){const npm=await npmCLI();await run(process.execPath,[npm,'--prefix',join(ROOT,'web'),'ci'])}
  await run(process.execPath,[join(ROOT,'web/scripts/api-types.mjs'),'--check']);
  await run(process.execPath,[join(ROOT,'web/node_modules/typescript/bin/tsc'),'--noEmit'],{cwd:join(ROOT,'web')});

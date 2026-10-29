@@ -30,7 +30,7 @@
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "6.1.2",
     "openapi-typescript": "7.13.0",
-    "typescript": "7.1.0-beta",
+    "typescript": "5.9.3",
     "vite": "8.3.5",
     "vitest": "5.0.5"
   },

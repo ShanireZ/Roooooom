@@ -28,7 +28,7 @@ Experimental source project. No downloadable binary release is published yet. De
 
 ## Build and try
 
-Build tools: Go 1.27.3, Node.js 24.22.1, and npm 12.2.1. Versions are pinned in the repository. For a Windows amd64 candidate:
+Build tools: Go 1.27.3, Node.js 26.13.0, and npm 12.2.1. Versions are pinned in the repository. For a Windows amd64 candidate:
 
 ```powershell
 git clone https://github.com/ShanireZ/Roooooom.git

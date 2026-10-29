@@ -4,7 +4,7 @@ Roooooom coordinates agents without taking over their hosts. Preserve that bound
 
 ## Toolchain and checks
 
-Use Go 1.27.3, Node.js 24.22.1, and npm 12.2.1. Do not install dependencies at a parent workspace root.
+Use Go 1.27.3, Node.js 26.13.0, and npm 12.2.1. Do not install dependencies at a parent workspace root.
 
 ```powershell
 npm --prefix web ci
