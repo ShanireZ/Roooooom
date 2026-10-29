@@ -1,4 +1,4 @@
-/* Base blueprint styles, scoped to the room UI root (.rm) so the pre-room UI is untouched until cutover. */
+/* Base blueprint styles, scoped to the UI root (.rm). */
 body:has(.rm){margin:0;background:var(--paper)}
 .rm{min-height:100dvh;background:var(--paper);color:var(--ink);font:15px/1.6 var(--font-body);font-synthesis:none;accent-color:var(--ink)}
 .rm *,.rm *::before,.rm *::after{box-sizing:border-box}

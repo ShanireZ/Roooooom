@@ -19,8 +19,9 @@ export function parseRoute(path:string):Route{
  if(parts[0]==='setup'&&parts.length===2&&id(parts[1]))return {name:'legacy',to:'roomDoor',projectId:parts[1]};
  if(parts[0]==='tasks'&&parts.length===2&&id(parts[1]))return {name:'legacyTask',id:parts[1]};
  if(parts[0]==='requests'&&parts.length===2&&id(parts[1]))return {name:'legacyRequest',id:parts[1]};
- if(path==='/settings'||path==='/rooms/settings')return {name:'settings'};
+ if(path==='/settings')return {name:'settings'};
  if(path==='/rooms/new')return {name:'newRoom'};
+ if(path==='/rooms/settings')return notFound;
  if(parts[0]!=='rooms'||!id(parts[1]))return notFound;
  const [, projectId,kind,target,extra]=parts;
  if(parts.length===2)return {name:'room',projectId};
@@ -47,7 +48,7 @@ export function routePath(route:Route):string{
  switch(route.name){
  case 'home':return '/';
  case 'newRoom':return '/rooms/new';
- case 'settings':return '/rooms/settings';
+ case 'settings':return '/settings';
  case 'room':{
   const base='/rooms/'+route.projectId,d=route.drawer;
   if(!d)return base;

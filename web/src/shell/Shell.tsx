@@ -9,7 +9,7 @@ import {IconGear,IconPlus} from '../ui/icons';
 import {Wordmark} from '../ui/Wordmark';
 import {ConnectionBanner,ConnectionIndicator} from './ConnectionBanner';
 import {NeedsYou} from './NeedsYou';
-import type {Route} from './routes';
+import {routePath,type Route} from './routes';
 import {useNeedsYou} from './useNeedsYou';
 
 type Project=Schema['ProjectView'];
@@ -37,7 +37,7 @@ export function Shell({route,retry,busy,children}:{route:Route;retry:()=>void;bu
    <div className="topbar-end">
     <ConnectionIndicator/>
     <NeedsYou items={needs.items} rooms={rooms}/>
-    <a className="gear" href="/rooms/settings" data-local title={t('shell.settings')}><IconGear/><span className="sr-only">{t('shell.settings')}</span></a>
+    <a className="gear" href={routePath({name:'settings'})} data-local title={t('shell.settings')}><IconGear/><span className="sr-only">{t('shell.settings')}</span></a>
    </div>
   </header>
   <ConnectionBanner retry={retry} busy={busy}/>

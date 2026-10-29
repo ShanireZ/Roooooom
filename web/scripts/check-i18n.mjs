@@ -4,8 +4,7 @@ import {readdir,readFile} from 'node:fs/promises';
 import {join,relative} from 'node:path';
 import {fileURLToPath} from 'node:url';
 const root=fileURLToPath(new URL('../src/',import.meta.url));
-// features/ and App.tsx are the pre-room UI; the cutover removes this exemption.
-const exempt=['i18n/catalog/','features/','App.tsx'];
+const exempt=['i18n/catalog/'];
 const cjk=/[\u3040-\u30ff\u3400-\u9fff\uf900-\ufaff]/;
 async function* files(dir){
  for(const entry of await readdir(dir,{withFileTypes:true})){

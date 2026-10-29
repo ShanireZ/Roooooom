@@ -28,7 +28,8 @@ export const test=base.extend<{service:LocalService;activate:()=>Promise<void>}>
   await use(async()=>{
    await page.goto(pathToFileURL(join(service.root,'activation.html')).href);
    await page.locator('form button[type=submit]').click();
-   await expect(page).toHaveURL(service.origin+'/setup');
+   // Activation lands on / which resolves to a room or to room creation.
+   await page.waitForURL(url=>url.href.startsWith(service.origin+'/rooms/'));
   });
  }
 });

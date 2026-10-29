@@ -30,6 +30,6 @@ export function useNeedsYou(projectOrder:readonly string[]){
    const at=items.findIndex(i=>needsYouKey(i)===needsYouKey(after));
    return at>=0?items[at+1]:items.find(i=>compare(i,after)>=0);
   };
-  return {items,byProject,next,error:query.error,fresh:query.fresh,refresh:query.refresh};
+  return {items,byProject,next,loaded:query.data!==undefined,error:query.error,fresh:query.fresh,refresh:query.refresh};
  },[query.data,query.error,query.fresh,query.refresh,projectOrder]);
 }

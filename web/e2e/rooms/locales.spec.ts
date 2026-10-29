@@ -27,7 +27,7 @@ for(const locale of LOCALES){
    [room+'/settings/members',t('session.status.active')],
    [room+'/settings/integrations',t('guided.github')],
    [service.origin+'/rooms/new',t('setup.title')],
-   [service.origin+'/rooms/settings',t('system.title')],
+   [service.origin+'/settings',t('system.title')],
   ];
   for(const [url,anchor] of surfaces){
    await page.goto(url);

@@ -45,7 +45,7 @@ func (a *api) activate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.SetCookie(w, &http.Cookie{Name: "roooooom_owner", Value: token, Path: "/", HttpOnly: true, SameSite: http.SameSiteStrictMode, MaxAge: 86400})
-	http.Redirect(w, r, "/setup", http.StatusSeeOther)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func (a *api) connectionInfo(w http.ResponseWriter, r *http.Request, actor model.Actor) {

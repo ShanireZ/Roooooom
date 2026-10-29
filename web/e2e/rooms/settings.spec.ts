@@ -10,7 +10,7 @@ const ja=createTranslator('ja').t;
 const ownerLanguage=async(page:import('@playwright/test').Page,origin:string)=>(await (await page.request.get(origin+'/api/v1/me')).json()).result.ownerLanguage??'';
 
 test('choosing Japanese writes the owner language, switches the UI and survives a reload in an en-US browser',async({page,service,activate})=>{
- await activate();await page.goto(service.origin+'/rooms/settings');
+ await activate();await page.goto(service.origin+'/settings');
  await expect(page.getByRole('heading',{name:m('system.title'),exact:true})).toBeVisible();
  await page.getByLabel(m('system.languageLabel'),{exact:true}).selectOption('ja');
  await expect(page.locator('html')).toHaveAttribute('lang','ja');
@@ -22,7 +22,7 @@ test('choosing Japanese writes the owner language, switches the UI and survives 
 });
 
 test('Follow browser clears the owner language',async({page,service,activate})=>{
- await activate();await page.goto(service.origin+'/rooms/settings');
+ await activate();await page.goto(service.origin+'/settings');
  await page.getByLabel(m('system.languageLabel'),{exact:true}).selectOption('zh-TW');
  await expect(page.locator('html')).toHaveAttribute('lang','zh-TW');
  await page.locator('select').first().selectOption('');
@@ -33,7 +33,7 @@ test('Follow browser clears the owner language',async({page,service,activate})=>
 });
 
 test('the language control is disabled while read-only',async({page,service,activate})=>{
- await activate();await page.goto(service.origin+'/rooms/settings');
+ await activate();await page.goto(service.origin+'/settings');
  await expect(page.getByLabel(m('system.languageLabel'),{exact:true})).toBeEnabled();
  await service.stop();
  await expect(page.getByLabel(m('system.languageLabel'),{exact:true})).toBeDisabled({timeout:15000});
@@ -41,7 +41,7 @@ test('the language control is disabled while read-only',async({page,service,acti
 });
 
 test('theme Dark sets data-theme and survives reload',async({page,service,activate})=>{
- await activate();await page.goto(service.origin+'/rooms/settings');
+ await activate();await page.goto(service.origin+'/settings');
  await page.getByLabel(m('system.theme'),{exact:true}).selectOption('dark');
  await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
  await page.reload();
@@ -52,7 +52,7 @@ test('theme Dark sets data-theme and survives reload',async({page,service,activa
 test('backup shows the private path and exports without credentials; storage shows the warning style',async({page,service,activate})=>{
  await activate();const project=await seedProject(page,service);const agent=await enroll(page,service,project.id,'Backup agent');
  await page.route('**/api/v1/queries/metrics',async route=>{await route.fulfill({contentType:'application/json',body:JSON.stringify({result:{storage:{databaseBytes:805306368,hardBytes:1073741824,warning:true},counters:{commands:12,rejected:1,commandP95Millis:3.5}}})})});
- await page.goto(service.origin+'/rooms/settings');
+ await page.goto(service.origin+'/settings');
  await expect(page.getByTestId('storage')).toHaveClass(/warning/);
  await expect(page.getByTestId('storage')).toContainText(m('system.storageWarning'));
  const snapshotResponse=page.waitForResponse(r=>r.url().endsWith('/commands/backup.create'));
@@ -72,7 +72,7 @@ test('backup shows the private path and exports without credentials; storage sho
 test('About shows the build fingerprint',async({page,service,activate})=>{
  await activate();
  await page.route('**/api/v1/me',async route=>{const response=await route.fetch();const body=await response.json();body.result.build={...body.result.build,metadata:{built:true,version:'0.1.0-dev',commit:'0123456789abcdef',dirty:false,sourceFingerprint:'f'.repeat(64)}};await route.fulfill({response,json:body})});
- await page.goto(service.origin+'/rooms/settings');
+ await page.goto(service.origin+'/settings');
  const about=page.getByRole('region',{name:m('system.about')});
  await expect(about).toContainText('f'.repeat(64));
  await expect(about).toContainText('0.1.0-dev');

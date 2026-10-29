@@ -16,10 +16,11 @@ var setupRoute = regexp.MustCompile("^/setup/[A-Za-z0-9_-]{1,128}$")
 var requestRoute = regexp.MustCompile("^/requests/[A-Za-z0-9_-]{1,128}$")
 
 // roomRoute mirrors web/src/shell/routes.ts; drawer state lives in the path.
+// "new" and "settings" are reserved after /rooms/; system settings live at /settings.
 var roomRoute = regexp.MustCompile("^/rooms/[A-Za-z0-9_-]{1,128}(/(tasks|requests|decisions|acceptance)/[A-Za-z0-9_-]{1,128}(/(overview|work|evidence|discussion|history|manage))?|/archive|/settings(/(door|members|integrations))?)?$")
 
 func Route(p string) bool {
-	return p == "/" || p == "/setup" || p == "/projects" || p == "/decisions" || p == "/settings" || taskRoute.MatchString(p) || setupRoute.MatchString(p) || requestRoute.MatchString(p) || roomRoute.MatchString(p) || strings.HasPrefix(p, "/assets/")
+	return p == "/" || p == "/setup" || p == "/projects" || p == "/decisions" || p == "/settings" || taskRoute.MatchString(p) || setupRoute.MatchString(p) || requestRoute.MatchString(p) || (roomRoute.MatchString(p) && p != "/rooms/settings") || strings.HasPrefix(p, "/assets/")
 }
 func Handler() http.Handler {
 	files, _ := fs.Sub(content, "dist")

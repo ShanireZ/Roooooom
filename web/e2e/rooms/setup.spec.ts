@@ -8,7 +8,7 @@ test.use({locale:'en-US'});
 const drawer=(page:import('@playwright/test').Page)=>page.getByRole('dialog');
 const settings=(service:{origin:string},projectId:string,section:string)=>service.origin+'/rooms/'+projectId+'/settings/'+section;
 
-test('one screen creates a room, opens the door and hands over join instructions',async({page,service,activate})=>{
+test('guided project connection needs no technical handles or integrations',async({page,service,activate})=>{
  await activate();await page.goto(service.origin+'/rooms/new');
  await page.getByLabel(m('setup.reference'),{exact:true}).fill('C:/Projects/SimpleProject');
  await expect(page.getByLabel(m('setup.name'),{exact:true})).toHaveValue('SimpleProject');
@@ -31,7 +31,7 @@ test('one screen creates a room, opens the door and hands over join instructions
  await expect(page.getByText(m('setup.joined',{name:'First agent'}))).toBeVisible();
 });
 
-test('lost room-create response retries the original request without a duplicate room',async({page,service,activate})=>{
+test('lost project-create response retries the original request without duplicate project',async({page,service,activate})=>{
  await activate();let lose=true;const ids:string[]=[];
  await page.route('**/api/v1/commands/project.create',async route=>{ids.push(route.request().postDataJSON().clientRequestId);if(lose){lose=false;await route.fetch();await route.abort('failed')}else await route.continue()});
  await page.goto(service.origin+'/rooms/new');
@@ -45,7 +45,7 @@ test('lost room-create response retries the original request without a duplicate
  expect(await ownerRead(page,service,'projects')).toHaveLength(1);
 });
 
-test('a failed door opening leaves the room registered and the room banner opens it later',async({page,service,activate})=>{
+test('enrollment failure resumes the registered project after refresh',async({page,service,activate})=>{
  await activate();let fail=true;
  await page.route('**/api/v1/commands/enrollment.enable',async route=>{if(fail){fail=false;await route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({error:{code:'temporary-unavailable'}})})}else await route.continue()});
  await page.goto(service.origin+'/rooms/new');
@@ -152,7 +152,7 @@ test('guided DingTalk accepts complete official URL without a test send',async({
  expect(commands.every(url=>url.startsWith(service.origin))).toBe(true);
 });
 
-test('advanced GitHub binding uses the saved credential reference and can be disabled',async({page,service,activate})=>{
+test('owner explicitly configures and disables a pinned outbound binding',async({page,service,activate})=>{
  await activate();const project=await seedProject(page,service);
  await page.goto(settings(service,project.id,'integrations'));
  const d=drawer(page);

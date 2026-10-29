@@ -1,9 +1,10 @@
-import {useRef,useState,type ReactNode} from 'react';
+import {useEffect,useRef,useState,type ReactNode} from 'react';
 import './room.css';
 import {useI18n} from '../i18n/I18nProvider';
 import {Feedback} from '../ui/Feedback';
 import {OpenDoorButton} from '../drawer/settings/RoomSettingsDrawer';
 import {TaskCreateDrawer} from '../drawer/task/TaskCreateDrawer';
+import {rememberRoom} from '../shell/home';
 import {useRooms} from '../shell/Shell';
 import {Activity} from './Activity';
 import {Cabinet} from './Cabinet';
@@ -19,6 +20,7 @@ export function RoomPage({projectId,name,drawer}:{projectId:string;name:string;d
  const {t}=useI18n(),room=useRoomData(projectId),project=useRooms().rooms.find(r=>r.id===projectId);
  const [focusedMember,setFocusedMember]=useState<string>(),[view,setView]=useState<'floor'|'activity'>('floor'),[creating,setCreating]=useState(false);
  const composer=useRef<ComposerHandle>(null);
+ useEffect(()=>rememberRoom(projectId),[projectId]);
  const select=(id:string)=>setFocusedMember(current=>current===id?undefined:id);
  const ask=()=>{setView('activity');composer.current?.ask()};
  const {floor}=room;

@@ -6,7 +6,7 @@ describe('parseRoute',()=>{
   const rows:[string,Route][]=[
    ['/',{name:'home'}],
    ['/rooms/new',{name:'newRoom'}],
-   ['/rooms/settings',{name:'settings'}],
+   ['/settings',{name:'settings'}],
    ['/rooms/p1',{name:'room',projectId:'p1'}],
    ['/rooms/p1/tasks/t1',{name:'room',projectId:'p1',drawer:{kind:'task',id:'t1',tab:'overview'}}],
    ['/rooms/p1/tasks/t1/work',{name:'room',projectId:'p1',drawer:{kind:'task',id:'t1',tab:'work'}}],
@@ -37,6 +37,6 @@ describe('parseRoute',()=>{
   expect(parseRoute('/requests/r9')).toEqual({name:'legacyRequest',id:'r9'});
  });
  it('rejects unknown or malformed paths',()=>{
-  for(const path of ['/rooms/x/tasks/y/bogus','/rooms/x/nope','/rooms','/rooms/a b','/rooms/x/settings/other','/elsewhere','/rooms/'+'x'.repeat(129)])expect(parseRoute(path),path).toEqual({name:'notFound'});
+  for(const path of ['/rooms/settings','/rooms/x/tasks/y/bogus','/rooms/x/nope','/rooms','/rooms/a b','/rooms/x/settings/other','/elsewhere','/rooms/'+'x'.repeat(129)])expect(parseRoute(path),path).toEqual({name:'notFound'});
  });
 });

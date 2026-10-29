@@ -167,6 +167,9 @@ func newAuthFixture(t *testing.T) *authFixture {
 	if w.Code != 303 {
 		t.Fatalf("activate %d %s", w.Code, w.Body.String())
 	}
+	if location := w.Header().Get("Location"); location != "/" {
+		t.Fatalf("activation redirects to %q, want the room home /", location)
+	}
 	cookies := w.Result().Cookies()
 	if len(cookies) == 0 {
 		t.Fatal("missing owner cookie")
