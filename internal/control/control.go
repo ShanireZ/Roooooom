@@ -28,12 +28,15 @@ type Proof struct {
 	Root            string `json:"dataRoot"`
 	Executable      string `json:"executable"`
 	NeedsActivation bool   `json:"needsActivation"`
+	// OwnerLanguage is presentation-only; older launchers ignore it.
+	OwnerLanguage string `json:"ownerLanguage,omitempty"`
 }
 type Config struct {
 	Root, Address, Executable, ServiceID, Generation string
 	Stop                                             func()
 	Activate                                         func(context.Context) (string, error)
 	NeedsActivation                                  func(context.Context) (bool, error)
+	OwnerLanguage                                    func(context.Context) (string, error)
 }
 type Server struct {
 	file File
@@ -113,7 +116,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
-		w.Write(model.JSON(Proof{1, s.file.ServiceID, s.file.Generation, s.file.Root, s.file.Executable, needs}))
+		proof := Proof{ProtocolVersion: 1, ServiceID: s.file.ServiceID, Generation: s.file.Generation, Root: s.file.Root, Executable: s.file.Executable, NeedsActivation: needs}
+		if s.cfg.OwnerLanguage != nil {
+			// A failed lookup only means the tray falls back to the OS language.
+			proof.OwnerLanguage, _ = s.cfg.OwnerLanguage(r.Context())
+		}
+		w.Write(model.JSON(proof))
 	case "/api/v1/control/activate":
 		if s.cfg.Activate == nil {
 			reject(503, "activation-unavailable")

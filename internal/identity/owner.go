@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"html"
 	"path/filepath"
+	"roooooom.local/roooooom/internal/i18n"
 	"roooooom.local/roooooom/internal/model"
 	"roooooom.local/roooooom/internal/privatefs"
 	"roooooom.local/roooooom/internal/store"
@@ -50,7 +51,16 @@ func (s *Service) IssueOwnerBootstrap(ctx context.Context) (string, error) {
 	if e != nil {
 		return "", e
 	}
-	form := `<!doctype html><html lang="zh-Hant"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; form-action ` + html.EscapeString(s.origin) + `; base-uri 'none'"><title>Roooooom · 開始使用</title><style>body{margin:0;background:#f5f7fa;color:#253044;font:16px/1.7 system-ui,'Microsoft JhengHei',sans-serif}main{max-width:520px;margin:14vh auto;padding:36px;background:white;border:1px solid #e3e7ef;border-radius:14px}h1{font-size:27px}p{color:#6b7789}button{font:inherit;background:#3057d5;color:white;border:0;border-radius:9px;padding:11px 22px;cursor:pointer}small{display:block;color:#8b94a3;margin-top:24px}@media(max-width:600px){main{margin:8vh 16px;padding:26px}}</style><main><strong>Roooooom</strong><h1>本機協作已準備好</h1><p>確認你的管理身分，接著加入專案。各 agent 繼續在原本的宿主工作。</p><form method="post" action="` + html.EscapeString(s.origin) + `/api/v1/setup/activate"><input type="hidden" name="capability" value="` + cap + `"><button type="submit">開始使用</button></form><small>只在這台電腦啟用，這個入口五分鐘內有效。</small></main></html>`
+	// No HTTP request precedes this local file, so the owner language and then
+	// the OS UI language choose its text.
+	owner, e := s.store.OwnerLanguage(ctx)
+	if e != nil {
+		return "", e
+	}
+	system, _ := i18n.OS()
+	l := i18n.First(i18n.Locale(owner), system)
+	t := func(k i18n.Key) string { return html.EscapeString(i18n.T(l, k)) }
+	form := `<!doctype html><html lang="` + string(l) + `"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; form-action ` + html.EscapeString(s.origin) + `; base-uri 'none'"><title>` + t(i18n.ActivationTitle) + `</title><style>` + ServerPageCSS + `</style><main><strong class="mark">ROOOOOOM</strong><h1>` + t(i18n.ActivationHeading) + `</h1><p>` + t(i18n.ActivationBody) + `</p><form method="post" action="` + html.EscapeString(s.origin) + `/api/v1/setup/activate"><input type="hidden" name="capability" value="` + cap + `"><button type="submit">` + t(i18n.ActivationButton) + `</button></form><small>` + t(i18n.ActivationFootnote) + `</small></main></html>`
 	if e = privatefs.WriteAtomic(s.Root(), "activation.html", []byte(form)); e != nil {
 		return "", e
 	}

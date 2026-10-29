@@ -958,6 +958,11 @@ export interface components {
             dataRoot: string;
             executable: string;
             needsActivation: boolean;
+            /**
+             * @description Presentation-only owner language for the native tray; omitted when unset. Older launchers ignore it.
+             * @enum {string}
+             */
+            ownerLanguage?: "en" | "zh-CN" | "zh-TW" | "ja";
         };
         /** @description Human-only durable intent, not an executable Task. Optional owner requirements must be preserved during conversion. */
         RequestCreate: {

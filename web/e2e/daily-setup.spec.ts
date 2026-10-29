@@ -5,7 +5,7 @@ import {pathToFileURL} from 'node:url';
 
 test('guided project connection needs no technical handles or integrations',async({page,service})=>{
  await page.goto(pathToFileURL(join(service.root,'activation.html')).href);
- await page.getByRole('button',{name:'開始使用',exact:true}).click();
+ await page.locator('form button[type=submit]').click();
  await page.getByLabel('Repository 路徑或網址',{exact:true}).fill('C:/Projects/SimpleProject');
  await expect(page.getByLabel('專案名稱',{exact:true})).toHaveValue('SimpleProject');
  await expect(page.getByText(/確認接入後.*允許/)).toBeVisible();

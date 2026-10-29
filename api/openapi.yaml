@@ -4065,6 +4065,16 @@
           },
           "needsActivation": {
             "type": "boolean"
+          },
+          "ownerLanguage": {
+            "type": "string",
+            "enum": [
+              "en",
+              "zh-CN",
+              "zh-TW",
+              "ja"
+            ],
+            "description": "Presentation-only owner language for the native tray; omitted when unset. Older launchers ignore it."
           }
         }
       },

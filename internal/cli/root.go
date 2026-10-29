@@ -112,7 +112,7 @@ func Run(ctx context.Context, args []string, in io.Reader, out, errOut io.Writer
 	identities.SetOrigin("http://" + ln.Addr().String())
 	serviceCtx, serviceCancel := context.WithCancel(ctx)
 	defer serviceCancel()
-	controller, err := control.New(control.Config{Root: rt.Root, Address: ln.Addr().String(), Executable: executable, ServiceID: rt.ServiceID, Generation: rt.Generation, Stop: serviceCancel, Activate: identities.IssueOwnerBootstrap, NeedsActivation: identities.NeedsOwnerActivation})
+	controller, err := control.New(control.Config{Root: rt.Root, Address: ln.Addr().String(), Executable: executable, ServiceID: rt.ServiceID, Generation: rt.Generation, Stop: serviceCancel, Activate: identities.IssueOwnerBootstrap, NeedsActivation: identities.NeedsOwnerActivation, OwnerLanguage: db.OwnerLanguage})
 	if err != nil {
 		fmt.Fprintln(errOut, "cannot initialize private own-service control")
 		return 1

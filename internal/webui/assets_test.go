@@ -25,3 +25,12 @@ func TestEmbeddedAppCannotReadProjectFiles(t *testing.T) {
 		}
 	}
 }
+
+func TestEmbeddedServerPageStylesheet(t *testing.T) {
+	r := httptest.NewRequest("GET", "http://127.0.0.1:7337/assets/server-pages.css", nil)
+	w := httptest.NewRecorder()
+	Handler().ServeHTTP(w, r)
+	if w.Code != 200 || !strings.HasPrefix(w.Header().Get("Content-Type"), "text/css") || !strings.Contains(w.Body.String(), "--paper:#f6f3ea") {
+		t.Fatalf("server page stylesheet: %d %q", w.Code, w.Header().Get("Content-Type"))
+	}
+}

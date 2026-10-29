@@ -13,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"roooooom.local/roooooom/internal/control"
+	"roooooom.local/roooooom/internal/i18n"
 	"roooooom.local/roooooom/internal/model"
 	"roooooom.local/roooooom/internal/privatefs"
 	appruntime "roooooom.local/roooooom/internal/runtime"
@@ -323,7 +324,14 @@ func Run(ctx context.Context, cfg Config, p Platform) error {
 	if !held || cfg.NoTray || cfg.Mode == "open" || cfg.Mode == "activate" {
 		return nil
 	}
-	e = p.ShowTray(Menu{Open: func() error { return client.open(context.Background(), p, false) }, Stop: func() error { return client.Stop(context.Background()) }, Activate: func() error { return client.open(context.Background(), p, true) }})
+	e = p.ShowTray(Menu{Open: func() error { return client.open(context.Background(), p, false) }, Stop: func() error { return client.Stop(context.Background()) }, Activate: func() error { return client.open(context.Background(), p, true) }, Language: func() i18n.Locale {
+		proof, e := client.Probe(context.Background())
+		if e != nil {
+			return ""
+		}
+		l, _ := i18n.Parse(proof.OwnerLanguage)
+		return l
+	}})
 	if errors.Is(e, ErrTrayUnavailable) {
 		return nil
 	}

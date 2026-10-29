@@ -76,10 +76,7 @@ func (Native) ShowTray(menu Menu) error {
 				popup, _, _ := user32.NewProc("CreatePopupMenu").Call()
 				if popup != 0 {
 					defer user32.NewProc("DestroyMenu").Call(popup)
-					for _, item := range []struct {
-						id    uintptr
-						label string
-					}{{1, "開啟看板"}, {4, "重新啟用"}, {2, "退出托盤（服務繼續）"}, {3, "停止服務並退出"}} {
+					for _, item := range trayLabels(menu.language()) {
 						if item.id == 4 && menu.Activate == nil {
 							continue
 						}

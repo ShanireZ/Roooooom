@@ -76,6 +76,7 @@ func TestGuidedExpiredActivationHasRecoveryInstructions(t *testing.T) {
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	request.Header.Set("Origin", "null")
 	request.Header.Set("Accept", "text/html")
+	request.Header.Set("Accept-Language", "zh-TW")
 	response := httptest.NewRecorder()
 	f.handler.ServeHTTP(response, request)
 	if response.Code != 409 || !strings.Contains(response.Body.String(), "重新啟用") || !strings.Contains(response.Header().Get("Content-Type"), "text/html") {

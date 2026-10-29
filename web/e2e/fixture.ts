@@ -27,7 +27,7 @@ export const test=base.extend<{service:LocalService;activate:()=>Promise<void>}>
  activate:async({page,service},use)=>{
   await use(async()=>{
    await page.goto(pathToFileURL(join(service.root,'activation.html')).href);
-   await page.getByRole('button',{name:'開始使用',exact:true}).click();
+   await page.locator('form button[type=submit]').click();
    await expect(page).toHaveURL(service.origin+'/setup');
   });
  }
