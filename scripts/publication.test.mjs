@@ -4,6 +4,7 @@ import {readFile,mkdtemp,writeFile,mkdir,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {spawnSync} from 'node:child_process';
+import {sourceHashes} from './lib/packaging.mjs';
 
 const checker=new URL('./check-publication.mjs',import.meta.url);
 function run(cwd,command,args){return spawnSync(command,args,{cwd,encoding:'utf8',windowsHide:true})}
@@ -24,4 +25,8 @@ test('public gate audits staged bytes, English docs and GPL metadata',async()=>{
 });
 test('project package metadata selects the exact GPL variant',async()=>{
  const web=JSON.parse(await readFile(new URL('../web/package.json',import.meta.url),'utf8'));const platforms=JSON.parse(await readFile(new URL('../packaging/platforms.json',import.meta.url),'utf8'));assert.equal(web.license,'GPL-3.0-only');assert.equal(platforms.license,'GPL-3.0-only');
+});
+test('extensionless legal-source hashes are stable across checkout line endings',async()=>{
+ const root=await mkdtemp(join(tmpdir(),'roooooom-publication-20261029-eol-'));
+ try{for(const name of ['LICENSE','COPYRIGHT'])await writeFile(join(root,name),'Legal text\nSecond line\n');const lf=await sourceHashes(['LICENSE','COPYRIGHT'],root);for(const name of ['LICENSE','COPYRIGHT'])await writeFile(join(root,name),'Legal text\r\nSecond line\r\n');assert.deepEqual(await sourceHashes(['LICENSE','COPYRIGHT'],root),lf)}finally{await rm(root,{recursive:true,force:true})}
 });
