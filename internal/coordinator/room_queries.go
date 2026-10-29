@@ -21,6 +21,7 @@ type needsYouItem struct {
 	DecisionRequestID model.ID  `json:"decisionRequestId,omitempty"`
 	CandidateID       model.ID  `json:"candidateId,omitempty"`
 	Code              string    `json:"code,omitempty"`
+	MessageKey        string    `json:"messageKey,omitempty"`
 	Summary           string    `json:"summary"`
 	Since             time.Time `json:"since"`
 }
@@ -67,7 +68,11 @@ func (s *Service) needsYou(tx readTx, project model.ID) ([]needsYouItem, error) 
 		if e != nil {
 			return nil, e
 		}
-		items = append(items, needsYouItem{Kind: "decision", ProjectID: r.ProjectID, TaskID: r.TaskID, RequestID: r.RequestID, DecisionRequestID: r.ID, Summary: r.Question, Since: r.ReceivedAt})
+		item := needsYouItem{Kind: "decision", ProjectID: r.ProjectID, TaskID: r.TaskID, RequestID: r.RequestID, DecisionRequestID: r.ID, Summary: r.Question, Since: r.ReceivedAt}
+		if strings.HasPrefix(r.ScopeKey, systemRiskScope) {
+			item.MessageKey = "system.riskStart"
+		}
+		items = append(items, item)
 	}
 	ids, e = idList(tx, "SELECT id FROM tasks WHERE phase NOT IN('done','cancelled') AND (?='' OR project_id=?) ORDER BY id", project, project)
 	if e != nil {

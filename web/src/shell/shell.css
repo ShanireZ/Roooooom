@@ -4,12 +4,12 @@
 .rm .room-tab .room-name{overflow:hidden;text-overflow:ellipsis}
 .rm .room-tab[aria-current=page]{border-color:var(--ink);background:var(--paper);font-weight:700}
 .rm .room-new{color:var(--ink-muted)}
-.rm .count{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;background:var(--owner);color:#fff;font:700 11px/1 var(--font-mono)}
+.rm .count{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;background:var(--owner);color:var(--on-owner);font:700 11px/1 var(--font-mono)}
 .rm .topbar-end{display:flex;align-items:center;gap:10px}
 .rm .conn-state{font-size:12px;color:var(--ink-muted);white-space:nowrap}
 .rm .conn-offline,.rm .conn-reconciling{color:var(--owner)}
-.rm .needs-button{min-height:40px;padding:4px 12px;background:var(--owner);border-color:var(--owner);color:#fff}
-.rm .needs-button .count{background:#fff;color:var(--owner)}
+.rm .needs-button{min-height:40px;padding:4px 12px;background:var(--owner);border-color:var(--owner);color:var(--on-owner)}
+.rm .needs-button .count{background:var(--on-owner);color:var(--owner)}
 .rm .gear{display:inline-grid;place-items:center;min-width:40px;min-height:40px;border:var(--rule) solid var(--ink-muted)}
 .rm .needs-panel{position:fixed;inset:56px 16px auto auto;margin:0;width:min(380px,calc(100vw - 32px));max-height:70vh;overflow:auto;padding:12px 14px;background:var(--paper);color:var(--ink);border:var(--rule) solid var(--ink);box-shadow:var(--lift) var(--lift) 0 var(--ink)}
 .rm .needs-groups,.rm .needs-items{list-style:none;margin:0;padding:0}

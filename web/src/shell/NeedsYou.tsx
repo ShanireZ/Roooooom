@@ -1,4 +1,5 @@
 import {useEffect,useRef,useState} from 'react';
+import {localizedSummary} from '../drawer/decision/systemQuestions';
 import {useI18n} from '../i18n/I18nProvider';
 import {Stamp} from '../ui/Stamp';
 import {RelativeTime} from '../ui/RelativeTime';
@@ -32,7 +33,7 @@ export function NeedsYou({items,rooms}:{items:NeedsYouItem[];rooms:Room[]}){
     <h3 className="needs-room">{room.name}</h3>
     <ul className="needs-items">{items.filter(i=>i.projectId===room.id).map(item=><li key={needsYouKey(item)}>
      <a href={needsYouPath(item)} data-local onClick={()=>panel.current?.hidePopover()}>
-      <Stamp kind={item.kind==='decision'?'formal':item.kind}/> <span className="needs-summary">{item.summary}</span>
+      <Stamp kind={item.kind==='decision'?'formal':item.kind}/> <span className="needs-summary">{localizedSummary(item,t)}</span>
       <span className="muted needs-since"><RelativeTime iso={item.since}/></span>
      </a>
     </li>)}</ul>

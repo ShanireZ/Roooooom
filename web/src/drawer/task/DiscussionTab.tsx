@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState,type ReactNode} from 'react';
 import type {Schema} from '../../api/client';
 import {useCollection,useResource} from '../../api/resource';
 import {useI18n} from '../../i18n/I18nProvider';
@@ -21,11 +21,12 @@ export function DiscussionTab({task,names}:{task:TaskView;names:Record<string,st
   <ChatForm projectId={task.projectId} task={task}/>
  </>;
 }
-function MessageRow({message,names}:{message:Message;names:Record<string,string>}){
+// One chat message with its purpose and lazily loaded delivery status; shared with the room feed.
+export function MessageRow({message,names,className,context}:{message:Message;names:Record<string,string>;className?:string;context?:ReactNode}){
  const {t}=useI18n(),[open,setOpen]=useState(false);
  const detail=useResource<Message&{receipts?:{participantId:string;state:string;version:number}[]}>('/api/v1/queries/message?targetId='+encodeURIComponent(message.id),open);
- return <li>
-  <div className="message-meta"><strong>{message.actorKind==='human'?t('activity.you'):names[message.actorId]??t('seat.revoked')}</strong><span className="chat-label">{t('activity.chat')}</span><RelativeTime iso={message.receivedAt}/></div>
+ return <li className={className}>
+  <div className="message-meta"><strong>{message.actorKind==='human'?t('activity.you'):names[message.actorId]??t('seat.revoked')}</strong><span className="chat-label">{t('activity.chat')}</span><RelativeTime iso={message.receivedAt}/>{context}</div>
   {message.imported?<p><Stamp kind="offline"/> <span className="muted">{t('activity.importedAt')} <RelativeTime iso={message.localOccurredAt??''}/></span></p>:null}
   <pre>{message.body}</pre>
   <p className="muted">{t(('purpose.'+message.purpose) as 'purpose.discussion')}{message.actionRequired?' · '+t('discussion.actionRequired'):''}</p>

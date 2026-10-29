@@ -3,6 +3,7 @@ import {command,type Schema} from '../../api/client';
 import {useCollection,useResource} from '../../api/resource';
 import {navigate} from '../../App';
 import {useI18n} from '../../i18n/I18nProvider';
+import {localizeSystemQuestion} from '../decision/systemQuestions';
 import {routePath} from '../../shell/routes';
 import {Feedback} from '../../ui/Feedback';
 import {Area,Select} from '../../ui/Field';
@@ -36,7 +37,7 @@ export function RequestDrawer({projectId,requestId}:{projectId:string;requestId:
    :open?<p className="muted">{t('request.waiting')}</p>:null}
   {r.designatedIntegratorId?<p className="muted">{t('composer.integrator')}: {names[r.designatedIntegratorId]??r.designatedIntegratorId.slice(0,8)}</p>:null}
   {r.constraints?.length?<section className="drawer-section"><h3>{t('task.constraints')}</h3><List items={r.constraints}/></section>:null}
-  {questions.data?.length?<section className="drawer-section"><h3>{t('request.questions')}</h3><ul className="plain-list">{questions.data.map(q=><li key={q.id}><Stamp kind="formal"/> <a href={routePath({name:'room',projectId,drawer:{kind:'decision',id:q.id}})} data-local>{q.question}</a></li>)}</ul></section>:null}
+  {questions.data?.length?<section className="drawer-section"><h3>{t('request.questions')}</h3><ul className="plain-list">{questions.data.map(q=><li key={q.id}><Stamp kind="formal"/> <a href={routePath({name:'room',projectId,drawer:{kind:'decision',id:q.id}})} data-local>{localizeSystemQuestion(q,t).question}</a></li>)}</ul></section>:null}
   {open?<details className="fold"><summary>{t('request.manage')}</summary><RequestControls request={r} sessions={sessions.data??[]} names={names} fresh={record.fresh&&sessions.fresh}/></details>:null}
   <TechnicalDetails><pre>{JSON.stringify(r,null,2)}</pre></TechnicalDetails>
  </Drawer>;

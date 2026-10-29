@@ -1084,6 +1084,11 @@ export interface components {
             candidateId?: string;
             /** @description Blocker code: integrator-revoked, integrator-session-ended, pending-reconciliation:<id>, preparer-session-ended or preparer-revoked. */
             code?: string;
+            /**
+             * @description Present only for system-generated questions; the UI renders the localized template and falls back to summary.
+             * @enum {string}
+             */
+            messageKey?: "system.riskStart";
             summary: string;
             /** Format: date-time */
             since: string;

@@ -552,4 +552,7 @@ export const zhCN={
  'language.zh-CN':"简体中文",
  'language.zh-TW':"繁體中文",
  'language.ja':"日本語",
+ 'purpose.handoff':"交接",
+ 'purpose.delivery':"交付",
+ 'purpose.decision-notice':"决策通知",
 } satisfies Record<MessageKey,string>;

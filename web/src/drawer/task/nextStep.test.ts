@@ -10,6 +10,11 @@ describe('nextStep',()=>{
   const step=nextStep({task:task(),assignments:[],needsYou:[{kind:'decision',projectId:'p',taskId:'t',summary:'Where does the TOC go?',since:''}] as NextStepInput['needsYou'],names});
   expect(step).toEqual({key:'task.next.decision',params:{question:'Where does the TOC go?'}});
  });
+ it('names a system question in the reader language',()=>{
+  const needsYou=[{kind:'decision',projectId:'p',taskId:'t',messageKey:'system.riskStart',summary:'是否批准此高風險任務？',since:''}] as NextStepInput['needsYou'];
+  const step=nextStep({task:task(),assignments:[],needsYou,names,summary:i=>i.messageKey==='system.riskStart'?'Approve this high-risk task?':i.summary});
+  expect(step).toEqual({key:'task.next.decision',params:{question:'Approve this high-risk task?'}});
+ });
  it('counts deliveries while integrating',()=>{
   const assignments=[{state:'submitted'},{state:'accepted'},{state:'claimed'}] as NextStepInput['assignments'];
   expect(nextStep({task:task({phase:'integrating'}),assignments,needsYou:[],names})).toEqual({key:'task.next.integrating',params:{name:'Codex',count:2}});

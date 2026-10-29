@@ -1,12 +1,12 @@
 import type {Schema} from '../../api/client';
 import type {MessageKey,Params} from '../../i18n/translator';
 
-export type NextStepInput={task:Schema['Task'];assignments:Schema['Assignment'][];needsYou:Schema['NeedsYouItem'][];names:Record<string,string>};
+export type NextStepInput={task:Schema['Task'];assignments:Schema['Assignment'][];needsYou:Schema['NeedsYouItem'][];names:Record<string,string>;summary?:(item:Schema['NeedsYouItem'])=>string};
 // One plain sentence about what happens next. It names responsibility, never live activity.
-export function nextStep({task,assignments,needsYou,names}:NextStepInput):{key:MessageKey;params?:Params}{
+export function nextStep({task,assignments,needsYou,names,summary=i=>i.summary}:NextStepInput):{key:MessageKey;params?:Params}{
  const mine=needsYou.filter(i=>i.taskId===task.id);
  const decision=mine.find(i=>i.kind==='decision');
- if(decision)return {key:'task.next.decision',params:{question:decision.summary}};
+ if(decision)return {key:'task.next.decision',params:{question:summary(decision)}};
  if(mine.some(i=>i.kind==='acceptance'))return {key:'task.next.acceptance'};
  if(mine.some(i=>i.kind==='blocker'))return {key:'task.next.blocker'};
  if(task.phase==='done')return {key:'task.next.done'};

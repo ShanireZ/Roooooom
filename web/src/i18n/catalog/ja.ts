@@ -552,4 +552,7 @@ export const ja={
  'language.zh-CN':"简体中文",
  'language.zh-TW':"繁體中文",
  'language.ja':"日本語",
+ 'purpose.handoff':"引き継ぎ",
+ 'purpose.delivery':"納品",
+ 'purpose.decision-notice':"決定の通知",
 } satisfies Record<MessageKey,string>;

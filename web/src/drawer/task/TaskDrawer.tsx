@@ -5,6 +5,7 @@ import {useI18n} from '../../i18n/I18nProvider';
 import {routePath,type TaskTab} from '../../shell/routes';
 import {Feedback} from '../../ui/Feedback';
 import {Drawer} from '../Drawer';
+import {localizedSummary} from '../decision/systemQuestions';
 import {DiscussionTab} from './DiscussionTab';
 import {EvidenceTab} from './EvidenceTab';
 import {HistoryTab} from './HistoryTab';
@@ -32,7 +33,7 @@ export function TaskDrawer({projectId,taskId,tab}:{projectId:string;taskId:strin
  const {names,people}=useNames(projectId);
  const close=()=>navigate(routePath({name:'room',projectId}));
  if(!task.data)return <Drawer title={task.error?t('task.notFound'):t('task.loading')} onClose={close}><Feedback error={task.error}/></Drawer>;
- const tk=task.data,step=nextStep({task:tk,assignments:assignments.data??[],needsYou:needs.data??[],names});
+ const tk=task.data,step=nextStep({task:tk,assignments:assignments.data??[],needsYou:needs.data??[],names,summary:i=>localizedSummary(i,t)});
  const shown=TABS.includes(tab)?tab:'overview';
  return <Drawer title={tk.goal} onClose={close}>
   <div className="drawer-summary">

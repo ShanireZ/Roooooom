@@ -147,6 +147,16 @@ test('the system risk question renders in the interface language',async({page,se
  await page.goto(service.origin+'/rooms/'+p.id+'/decisions/'+question.id);
  await expect(page.getByRole('heading',{level:2,name:m('sysq.risk.question')})).toBeVisible();
  await expect(page.getByRole('radio',{name:new RegExp(m('sysq.risk.option.authorize-bounded.label'))})).toBeVisible();
+ await page.goto(service.origin+'/rooms/'+p.id);
+ await page.getByRole('button',{name:new RegExp(m('shell.needsYou'))}).click();
+ const panel=page.locator('#needs-you-panel');
+ await expect(panel).toContainText(m('sysq.risk.question'));
+ await expect(panel).not.toContainText(question.question);
+ await page.keyboard.press('Escape');
+ await page.goto(service.origin+'/rooms/'+p.id+'/tasks/'+task.id);
+ await expect(page.getByRole('dialog')).toContainText(m('task.next.decision',{question:m('sysq.risk.question')}));
+ await page.goto(service.origin+'/rooms/'+p.id+'/tasks/'+task.id+'/history');
+ await expect(page.getByRole('dialog').getByRole('link',{name:m('sysq.risk.question')})).toBeVisible();
 });
 
 test('a question changed elsewhere disables the open form until it is reopened',async({page,service,activate})=>{

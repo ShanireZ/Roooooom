@@ -4563,6 +4563,13 @@
             "type": "string",
             "description": "Blocker code: integrator-revoked, integrator-session-ended, pending-reconciliation:<id>, preparer-session-ended or preparer-revoked."
           },
+          "messageKey": {
+            "type": "string",
+            "enum": [
+              "system.riskStart"
+            ],
+            "description": "Present only for system-generated questions; the UI renders the localized template and falls back to summary."
+          },
           "summary": {
             "type": "string"
           },

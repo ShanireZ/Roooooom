@@ -552,5 +552,8 @@ export const en={
  'language.zh-CN':"简体中文",
  'language.zh-TW':"繁體中文",
  'language.ja':"日本語",
+ 'purpose.handoff':"Handoff",
+ 'purpose.delivery':"Delivery",
+ 'purpose.decision-notice':"Decision notice",
 } as const;
 export type MessageKey=keyof typeof en;

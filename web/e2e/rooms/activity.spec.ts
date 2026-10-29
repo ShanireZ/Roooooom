@@ -1,5 +1,5 @@
 import {test,expect} from '../fixture';
-import {agentCommand,enroll,ownerRead,seedProject} from '../helpers';
+import {agentCommand,claimIntegrator,enroll,ownerRead,seedProject,seedTask} from '../helpers';
 import {m} from '../i18n';
 
 test.use({locale:'en-US'});
@@ -86,4 +86,45 @@ test('service loss during ask submit keeps every requirement and retries exactly
  const saved=await ownerRead(page,service,'requests',undefined,p.id);
  expect(saved).toHaveLength(1);
  expect(saved[0]).toMatchObject({constraints:['Keep the login method'],collaboratorLimit:2,designatedIntegratorId:a.participantId,acceptancePolicy:{mode:'human',conditions:['Exact-version tests pass']}});
+});
+
+test('a task-thread message shows its body in the room feed with a link to its task',async({page,service,activate})=>{
+ await activate();
+ const p=await seedProject(page,service),task=await seedTask(page,service,p,'integrator','Thread table');
+ const agent=await enroll(page,service,p.id,'Codex');await claimIntegrator(page,service,agent,task.id);
+ await agentCommand(agent,'message.send',{projectId:p.id,taskId:task.id,threadId:'task',purpose:'discussion',priority:'normal',body:'Task thread note for the owner.',recipientMode:'participants',recipientIds:[agent.participantId],actionRequired:false});
+ await page.goto(service.origin+'/rooms/'+p.id);
+ const entry=feed(page).getByRole('listitem').filter({hasText:'Task thread note for the owner.'});
+ await expect(entry).toContainText('Codex');
+ await expect(entry.getByRole('link',{name:'Thread table'})).toHaveAttribute('href','/rooms/'+p.id+'/tasks/'+task.id+'/discussion');
+});
+
+test('project chat in the feed shows its purpose, a handling request and delivery status',async({page,service,activate})=>{
+ await activate();
+ const p=await seedProject(page,service);
+ const a=await enroll(page,service,p.id,'Codex'),b=await enroll(page,service,p.id,'Gemini');
+ await agentCommand(a,'message.send',{projectId:p.id,threadId:'project',purpose:'delivery',priority:'normal',body:'Please review the delivered pages.',recipientMode:'participants',recipientIds:[b.participantId],actionRequired:true});
+ await page.goto(service.origin+'/rooms/'+p.id);
+ const entry=feed(page).getByRole('listitem').filter({hasText:'Please review the delivered pages.'});
+ await expect(entry).toContainText(m('purpose.delivery'));
+ await expect(entry).toContainText(m('discussion.actionRequired'));
+ await entry.getByText(m('discussion.receipts')).click();
+ await expect(entry).toContainText('Gemini');
+ await expect(entry).toContainText('stored');
+});
+
+test('loading earlier activity keeps the reader in place instead of jumping to the newest entry',async({page,service,activate})=>{
+ await page.setViewportSize({width:1440,height:900});
+ await activate();
+ const p=await seedProject(page,service),agent=await enroll(page,service,p.id,'Codex');
+ for(let i=0;i<105;i++)await agentCommand(agent,'message.send',{projectId:p.id,threadId:'project',purpose:'status',priority:'normal',body:'Status note '+i,recipientMode:'participants',recipientIds:[agent.participantId],actionRequired:false});
+ await page.goto(service.origin+'/rooms/'+p.id);
+ const list=feed(page);
+ await expect(list).toContainText('Status note 104');
+ await list.evaluate(el=>{el.scrollTop=0});
+ await list.getByRole('button',{name:m('activity.older')}).click();
+ await expect(list).toContainText('Status note 0');
+ await page.waitForTimeout(300);
+ const fromBottom=await list.evaluate(el=>el.scrollHeight-el.scrollTop-el.clientHeight);
+ expect(fromBottom).toBeGreaterThan(1000);
 });

@@ -1,6 +1,7 @@
 import type {Schema} from '../../api/client';
 import {useCollection} from '../../api/resource';
 import {useI18n} from '../../i18n/I18nProvider';
+import {localizeSystemQuestion} from '../decision/systemQuestions';
 import {routePath} from '../../shell/routes';
 import {RelativeTime} from '../../ui/RelativeTime';
 import {Stamp} from '../../ui/Stamp';
@@ -13,7 +14,7 @@ export function HistoryTab({task}:{task:TaskView}){
  if(!decisions.data?.length)return <p className="muted">{t('history.empty')}</p>;
  return <ul className="record-list" aria-label={t('task.tab.history')}>
   {decisions.data.map(d=><li key={d.id}>
-   <Stamp kind="formal"/> <a href={routePath({name:'room',projectId:task.projectId,drawer:{kind:'decision',id:d.id}})} data-local>{d.question}</a>
+   <Stamp kind="formal"/> <a href={routePath({name:'room',projectId:task.projectId,drawer:{kind:'decision',id:d.id}})} data-local>{localizeSystemQuestion(d,t).question}</a>
    <p className="muted">{t(('decision.state.'+d.state) as 'decision.state.pending')} · v{d.version}{d.resolutionOutcome?' · '+d.resolutionOutcome:''} · <RelativeTime iso={d.receivedAt}/></p>
   </li>)}
  </ul>;

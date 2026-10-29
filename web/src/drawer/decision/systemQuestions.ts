@@ -2,6 +2,10 @@ import type {Schema} from '../../api/client';
 import type {Translator} from '../../i18n/translator';
 
 export type LocalizedQuestion={question:string;reason:string;options:{id:string;label:string;impact:string}[];recommendationReason:string;canContinue:string[];noDecisionBehavior:string};
+// A one-line summary (Needs you, next step) of a system question, in the reader language.
+export function localizedSummary(item:{messageKey?:string;summary:string},t:Translator['t']):string{
+ return item.messageKey==='system.riskStart'?t('sysq.risk.question'):item.summary;
+}
 const RISK_OPTIONS=['authorize-bounded','revise-first'];
 
 // System-authored questions carry a messageKey and render in the reader's language;

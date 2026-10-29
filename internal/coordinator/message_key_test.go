@@ -36,6 +36,14 @@ func TestRiskQuestionMessageKey(t *testing.T) {
 	if e = json.Unmarshal(one.Data, &detail); e != nil || detail.Request["messageKey"] != "system.riskStart" {
 		t.Fatalf("detail messageKey %s, %v", one.Data, e)
 	}
+	needs, e := f.Core.Read(context.Background(), f.Owner(), model.Query{Kind: "needs-you"})
+	if e != nil {
+		t.Fatal(e)
+	}
+	var items []map[string]any
+	if e = json.Unmarshal(needs.Data, &items); e != nil || len(items) != 1 || items[0]["messageKey"] != "system.riskStart" {
+		t.Fatalf("needs-you messageKey %s, %v", needs.Data, e)
+	}
 	var stored string
 	if e = f.Store.QueryRow(context.Background(), "SELECT body FROM decision_requests WHERE task_id=?", task.ResourceID).Scan(&stored); e != nil {
 		t.Fatal(e)

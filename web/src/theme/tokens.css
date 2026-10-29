@@ -1,7 +1,8 @@
-/* Blueprint tokens (docs/ui-design.md §10). Only lightness may change, and only to reach WCAG AA. */
+/* Blueprint tokens (docs/ui-design.md §10). Only lightness may change, and only to reach WCAG AA.
+   Text on owner and danger fills uses --on-owner / --on-danger so each theme keeps AA. */
 :root{
- --paper:#f6f3ea;--paper-2:#efeadc;--ink:#1d3557;--ink-muted:#1d3557ab;--grid:#1d355714;
- --active:#457b9d;--owner:#c2410c;--owner-bg:#fff4ec;--danger:#9f1239;--note:#fffbe6;--on-ink:#f6f3ea;
+ --paper:#f6f3ea;--paper-2:#efeadc;--ink:#1d3557;--ink-muted:#4b5b76;--grid:#1d355714;
+ --active:#457b9d;--owner:#c2410c;--owner-bg:#fff4ec;--danger:#9f1239;--note:#fffbe6;--on-ink:#f6f3ea;--on-owner:#ffffff;--on-danger:#ffffff;
  --agent-0:#0f766e;--agent-1:#4338ca;--agent-2:#a21caf;--agent-3:#4d7c0f;--agent-4:#0369a1;--agent-5:#6d28d9;--on-agent:#ffffff;
  --font-body:"Segoe UI",system-ui,sans-serif;
  --font-mono:"Cascadia Mono","JetBrains Mono",Consolas,ui-monospace,monospace;
@@ -14,14 +15,14 @@
 @media (prefers-color-scheme:dark){
  :root:not([data-theme=light]){
   --paper:#0f1b2d;--paper-2:#142540;--ink:#d7e3f4;--ink-muted:#d7e3f4ab;--grid:#d7e3f414;
-  --active:#7fb3d5;--owner:#f59e0b;--owner-bg:#2a1d08;--danger:#fb7185;--note:#2e2a17;--on-ink:#0f1b2d;
+  --active:#7fb3d5;--owner:#f59e0b;--owner-bg:#2a1d08;--danger:#fb7185;--note:#2e2a17;--on-ink:#0f1b2d;--on-owner:#1b1203;--on-danger:#2b0a13;
   --agent-0:#2dd4bf;--agent-1:#a5b4fc;--agent-2:#f0abfc;--agent-3:#bef264;--agent-4:#7dd3fc;--agent-5:#c4b5fd;--on-agent:#0f1b2d;
   color-scheme:dark;
  }
 }
 :root[data-theme=dark]{
  --paper:#0f1b2d;--paper-2:#142540;--ink:#d7e3f4;--ink-muted:#d7e3f4ab;--grid:#d7e3f414;
- --active:#7fb3d5;--owner:#f59e0b;--owner-bg:#2a1d08;--danger:#fb7185;--note:#2e2a17;--on-ink:#0f1b2d;
+ --active:#7fb3d5;--owner:#f59e0b;--owner-bg:#2a1d08;--danger:#fb7185;--note:#2e2a17;--on-ink:#0f1b2d;--on-owner:#1b1203;--on-danger:#2b0a13;
  --agent-0:#2dd4bf;--agent-1:#a5b4fc;--agent-2:#f0abfc;--agent-3:#bef264;--agent-4:#7dd3fc;--agent-5:#c4b5fd;--on-agent:#0f1b2d;
  color-scheme:dark;
 }
