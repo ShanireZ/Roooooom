@@ -27,6 +27,9 @@ func (s *Service) Read(ctx context.Context, a model.Actor, q model.Query) (view 
 	if q.Kind == "requests" || q.Kind == "request" {
 		return s.readRequests(ctx, a, q)
 	}
+	if q.Kind == "needs-you" || q.Kind == "activity" {
+		return s.readRoom(ctx, a, q)
+	}
 	if q.Kind == "bindings" || q.Kind == "outbound-jobs" {
 		if q.Limit == 0 {
 			q.Limit = 100
@@ -95,6 +98,11 @@ func (s *Service) Read(ctx context.Context, a model.Actor, q model.Query) (view 
 			if e = s.taskView(tx, &task); e != nil {
 				return e
 			}
+			times, e := taskTimes(tx, task.ProjectID)
+			if e != nil {
+				return e
+			}
+			applyTaskTimes(&task, times)
 			view.Data = model.JSON(task)
 			return nil
 		case "assignment":
@@ -118,7 +126,7 @@ func (s *Service) Read(ctx context.Context, a model.Actor, q model.Query) (view 
 			return nil
 		}
 		project := q.ProjectID
-		if q.Kind == "assignments" {
+		if q.Kind == "assignments" && q.TargetID != "" {
 			task, e := loadTask(tx, q.TargetID)
 			if e != nil {
 				return e
@@ -146,7 +154,12 @@ func (s *Service) Read(ctx context.Context, a model.Actor, q model.Query) (view 
 		case "tasks", "attention":
 			rows, e = tx.Query("SELECT t.id,t.body FROM tasks t WHERE t.id>? AND (?='' OR t.project_id=?) AND (?='human' OR (EXISTS(SELECT 1 FROM participant_projects m WHERE m.project_id=t.project_id AND m.participant_id=?) AND t.project_id IN(SELECT value FROM json_each(?)))) ORDER BY t.id LIMIT ?", mark.AfterID, project, project, a.Kind, a.ParticipantID, string(model.JSON(a.ProjectIDs)), q.Limit+1)
 		case "assignments":
-			rows, e = tx.Query("SELECT id,body FROM assignments WHERE task_id=? AND id>? ORDER BY id LIMIT ?", q.TargetID, string(mark.AfterID), q.Limit+1)
+			if q.TargetID != "" {
+				rows, e = tx.Query("SELECT id,body FROM assignments WHERE task_id=? AND id>? ORDER BY id LIMIT ?", q.TargetID, string(mark.AfterID), q.Limit+1)
+			} else {
+				// A room reads every open task's assignments in one request.
+				rows, e = tx.Query("SELECT a.id,a.body FROM assignments a JOIN tasks t ON t.id=a.task_id WHERE t.project_id=? AND t.phase IN('ready','active','integrating','review') AND a.id>? ORDER BY a.id LIMIT ?", project, string(mark.AfterID), q.Limit+1)
+			}
 		case "sessions":
 			rows, e = tx.Query("SELECT s.id,s.body FROM sessions s WHERE s.id>? AND EXISTS(SELECT 1 FROM participant_projects m WHERE m.participant_id=s.participant_id AND (?='' OR m.project_id=?) AND (?='human' OR (EXISTS(SELECT 1 FROM participant_projects own WHERE own.project_id=m.project_id AND own.participant_id=?) AND m.project_id IN(SELECT value FROM json_each(?))))) ORDER BY s.id LIMIT ?", mark.AfterID, project, project, a.Kind, a.ParticipantID, string(model.JSON(a.ProjectIDs)), q.Limit+1)
 		case "participants":
@@ -188,6 +201,7 @@ func (s *Service) Read(ctx context.Context, a model.Actor, q model.Query) (view 
 			records = records[:q.Limit]
 		}
 		result := []any{}
+		timesByProject := map[model.ID]map[model.ID]activityTimes{}
 		after := mark.AfterID
 		encodedBytes := 0
 		for _, r := range records {
@@ -236,6 +250,13 @@ func (s *Service) Read(ctx context.Context, a model.Actor, q model.Query) (view 
 					}
 					body["enrollmentEnabled"] = grants > 0
 				}
+				created, e := projectCreatedAt(tx, r.id)
+				if e != nil {
+					return e
+				}
+				if !created.IsZero() {
+					body["createdAt"] = created
+				}
 				result = append(result, body)
 			case "tasks", "attention":
 				var task model.Task
@@ -245,6 +266,14 @@ func (s *Service) Read(ctx context.Context, a model.Actor, q model.Query) (view 
 				if e = s.taskView(tx, &task); e != nil {
 					return e
 				}
+				times, ok := timesByProject[task.ProjectID]
+				if !ok {
+					if times, e = taskTimes(tx, task.ProjectID); e != nil {
+						return e
+					}
+					timesByProject[task.ProjectID] = times
+				}
+				applyTaskTimes(&task, times)
 				if q.Kind == "tasks" || len(task.Attention) > 0 {
 					result = append(result, task)
 				}

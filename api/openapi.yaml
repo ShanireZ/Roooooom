@@ -289,7 +289,9 @@
                 "bindings",
                 "outbound-jobs",
                 "requests",
-                "request"
+                "request",
+                "needs-you",
+                "activity"
               ]
             }
           },
@@ -345,7 +347,8 @@
               }
             }
           }
-        }
+        },
+        "description": "needs-you and activity are owner-only room reads; assignments accepts projectId without targetId to read every open task's assignments."
       }
     },
     "/api/v1/sessions": {
@@ -1366,6 +1369,21 @@
             "enum": [
               "owner"
             ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Read-only, derived from events: first event about the task."
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Read-only, derived from events: latest event about the task or its records."
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Read-only, derived from events: completion time; present only when phase is done."
           }
         }
       },
@@ -3105,6 +3123,11 @@
           "enrollmentEnabled": {
             "type": "boolean",
             "description": "Returned only to human owners; no enrollment capability."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Read-only, derived from the project creation event."
           }
         },
         "required": [
@@ -4501,6 +4524,96 @@
           }
         },
         "description": "Human cookie + Origin + CSRF only. Sets the owner language used by the browser, activation page, tray and notifications; an empty value clears it. Grants no authority and is not readable by agents."
+      },
+      "NeedsYouItem": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "projectId",
+          "summary",
+          "since"
+        ],
+        "description": "Owner-only room read: one item only the owner can move forward. Aggregates existing records; grants nothing.",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "decision",
+              "acceptance",
+              "blocker"
+            ]
+          },
+          "projectId": {
+            "type": "string"
+          },
+          "taskId": {
+            "type": "string"
+          },
+          "requestId": {
+            "type": "string"
+          },
+          "decisionRequestId": {
+            "type": "string"
+          },
+          "candidateId": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string",
+            "description": "Blocker code: integrator-revoked, integrator-session-ended, pending-reconciliation:<id>, preparer-session-ended or preparer-revoked."
+          },
+          "summary": {
+            "type": "string"
+          },
+          "since": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ActivityEntry": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "seq",
+          "kind",
+          "resourceId",
+          "receivedAt",
+          "imported"
+        ],
+        "description": "Owner-only room feed entry, newest first; message bodies come from the thread query.",
+        "properties": {
+          "seq": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "resourceId": {
+            "type": "string"
+          },
+          "taskId": {
+            "type": "string"
+          },
+          "requestId": {
+            "type": "string"
+          },
+          "actorId": {
+            "type": "string"
+          },
+          "actorKind": {
+            "type": "string"
+          },
+          "receivedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "imported": {
+            "type": "boolean"
+          }
+        }
       }
     }
   },

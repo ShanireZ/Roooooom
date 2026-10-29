@@ -89,6 +89,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** @description needs-you and activity are owner-only room reads; assignments accepts projectId without targetId to read every open task's assignments. */
         get: operations["readWorkspace"];
         put?: never;
         post?: never;
@@ -372,6 +373,21 @@ export interface components {
             sourceConstraints?: string[];
             /** @enum {string} */
             collaboratorLimitSource?: "owner";
+            /**
+             * Format: date-time
+             * @description Read-only, derived from events: first event about the task.
+             */
+            createdAt?: string;
+            /**
+             * Format: date-time
+             * @description Read-only, derived from events: latest event about the task or its records.
+             */
+            updatedAt?: string;
+            /**
+             * Format: date-time
+             * @description Read-only, derived from events: completion time; present only when phase is done.
+             */
+            completedAt?: string;
         };
         AssignmentCreate: {
             taskId: string;
@@ -753,6 +769,11 @@ export interface components {
             repositories: components["schemas"]["RepositoryView"][];
             /** @description Returned only to human owners; no enrollment capability. */
             enrollmentEnabled?: boolean;
+            /**
+             * Format: date-time
+             * @description Read-only, derived from the project creation event.
+             */
+            createdAt?: string;
         };
         ParticipantView: {
             id: string;
@@ -1052,6 +1073,35 @@ export interface components {
             /** @enum {string} */
             language: "" | "en" | "zh-CN" | "zh-TW" | "ja";
         };
+        /** @description Owner-only room read: one item only the owner can move forward. Aggregates existing records; grants nothing. */
+        NeedsYouItem: {
+            /** @enum {string} */
+            kind: "decision" | "acceptance" | "blocker";
+            projectId: string;
+            taskId?: string;
+            requestId?: string;
+            decisionRequestId?: string;
+            candidateId?: string;
+            /** @description Blocker code: integrator-revoked, integrator-session-ended, pending-reconciliation:<id>, preparer-session-ended or preparer-revoked. */
+            code?: string;
+            summary: string;
+            /** Format: date-time */
+            since: string;
+        };
+        /** @description Owner-only room feed entry, newest first; message bodies come from the thread query. */
+        ActivityEntry: {
+            /** Format: int64 */
+            seq: number;
+            kind: string;
+            resourceId: string;
+            taskId?: string;
+            requestId?: string;
+            actorId?: string;
+            actorKind?: string;
+            /** Format: date-time */
+            receivedAt: string;
+            imported: boolean;
+        };
     };
     responses: never;
     parameters: never;
@@ -1212,7 +1262,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                kind: "projects" | "tasks" | "task" | "assignments" | "assignment" | "sessions" | "attention" | "inbox" | "thread" | "message" | "decisions" | "decision" | "deliveries" | "delivery" | "integrations" | "candidate" | "acceptances" | "completions" | "offline-candidates" | "offline-candidate" | "metrics" | "participants" | "candidates" | "bindings" | "outbound-jobs" | "requests" | "request";
+                kind: "projects" | "tasks" | "task" | "assignments" | "assignment" | "sessions" | "attention" | "inbox" | "thread" | "message" | "decisions" | "decision" | "deliveries" | "delivery" | "integrations" | "candidate" | "acceptances" | "completions" | "offline-candidates" | "offline-candidate" | "metrics" | "participants" | "candidates" | "bindings" | "outbound-jobs" | "requests" | "request" | "needs-you" | "activity";
             };
             cookie?: never;
         };

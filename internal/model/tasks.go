@@ -1,5 +1,7 @@
 package model
 
+import "time"
+
 type AcceptancePolicy struct {
 	Mode           string   `json:"mode"`
 	AcceptorID     ID       `json:"acceptorId,omitempty"`
@@ -43,6 +45,10 @@ type Task struct {
 	LatestIntegrationID     ID                    `json:"latestIntegrationId,omitempty"`
 	LastCompletionID        ID                    `json:"lastCompletionId,omitempty"`
 	DecisionVersions        map[ID]int64          `json:"decisionVersions"`
+	// Read-only view times derived from events; never written to task bodies.
+	CreatedAt   *time.Time `json:"createdAt,omitempty"`
+	UpdatedAt   *time.Time `json:"updatedAt,omitempty"`
+	CompletedAt *time.Time `json:"completedAt,omitempty"`
 }
 
 type RecordRef struct {
