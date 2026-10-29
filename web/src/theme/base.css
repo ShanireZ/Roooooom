@@ -1,0 +1,62 @@
+/* Base blueprint styles, scoped to the room UI root (.rm) so the pre-room UI is untouched until cutover. */
+body:has(.rm){margin:0;background:var(--paper)}
+.rm{min-height:100dvh;background:var(--paper);color:var(--ink);font:15px/1.6 var(--font-body);font-synthesis:none;accent-color:var(--ink)}
+.rm *,.rm *::before,.rm *::after{box-sizing:border-box}
+.rm :lang(ja){line-break:strict}
+.rm h1,.rm h2,.rm h3,.rm h4{margin:0 0 .5em;line-height:1.35;overflow-wrap:anywhere}
+.rm p{margin:0 0 .8em}
+.rm a{color:inherit}
+.rm .mono{font-family:var(--font-mono);font-size:12px;overflow-wrap:anywhere}
+.rm .label{font-family:var(--font-mono);font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--ink-muted)}
+.rm :lang(zh-TW) .label,.rm :lang(zh-CN) .label,.rm :lang(ja) .label{font-family:var(--font-body);text-transform:none;letter-spacing:.2px}
+.rm .muted{color:var(--ink-muted);font-size:13px}
+.rm .sr-only{position:absolute;clip-path:inset(50%);overflow:hidden;width:1px;height:1px;margin:-1px;padding:0;border:0;white-space:nowrap}
+.rm pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;margin:0}
+
+/* Controls: square, ink-ruled, 48px targets. */
+.rm button,.rm .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:8px 18px;font:inherit;font-weight:700;border:var(--rule) solid var(--ink);border-radius:var(--radius);background:var(--ink);color:var(--on-ink);cursor:pointer;text-decoration:none}
+.rm .btn-ghost{background:transparent;color:var(--ink)}
+.rm .btn-owner{background:var(--owner);border-color:var(--owner);color:#fff}
+.rm .btn-danger{background:var(--danger);border-color:var(--danger);color:#fff}
+.rm .btn-text{min-height:44px;padding:0 4px;border:0;background:transparent;color:inherit;font-weight:600;text-decoration:underline}
+.rm button:disabled{opacity:.5;cursor:default}
+.rm :focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.rm input,.rm textarea,.rm select{width:100%;min-height:48px;max-width:100%;padding:9px 11px;font:inherit;font-size:1rem;color:inherit;background:var(--paper);border:var(--rule) solid var(--ink);border-radius:var(--radius)}
+.rm textarea{min-height:96px;resize:vertical}
+.rm input:user-invalid,.rm textarea:user-invalid,.rm select:user-invalid{border-color:var(--danger)}
+.rm .field{display:block;margin-bottom:14px;min-width:0}
+.rm .field>label,.rm label.field{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+.rm .choice{display:flex;align-items:center;gap:10px;min-height:48px;font-weight:400;cursor:pointer}
+.rm .choice input{width:18px;min-height:0;height:18px;margin:0;flex:0 0 18px}
+.rm fieldset{border:0;margin:0;padding:0;min-width:0}
+.rm legend{font-weight:700;margin-bottom:10px}
+
+/* Stamps pair text with an outline so color never carries meaning alone. */
+.rm .stamp{display:inline-flex;align-items:center;gap:5px;padding:1px 8px;font-size:12px;font-weight:800;letter-spacing:.3px;border:2px solid var(--ink);border-radius:var(--radius);white-space:nowrap}
+.rm .stamp-formal{border-color:var(--owner);color:var(--owner)}
+.rm .stamp-blocker{border:3px double var(--owner);color:var(--owner)}
+.rm .stamp-offline{border:var(--rule) dashed var(--ink)}
+.rm .stamp-danger{background:var(--danger);border-color:var(--danger);color:#fff}
+
+/* Folds keep details discoverable one layer down. */
+.rm .fold{border-top:1px dashed var(--ink-muted);padding:4px 0}
+.rm .fold>summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font-size:13px;font-weight:600;color:var(--ink-muted)}
+.rm .fold[open]>summary{color:var(--ink)}
+.rm .tech{font-family:var(--font-mono);font-size:12px;overflow-wrap:anywhere}
+
+/* Progress: one segment per assignment. */
+.rm .bar{display:flex;gap:3px;margin:6px 0 2px}
+.rm .bar>i{flex:1;height:5px;background:var(--grid)}
+.rm .bar>.seg-accepted{background:var(--ink)}
+.rm .bar>.seg-active{background:var(--active)}
+.rm .bar>.seg-owner{background:var(--owner)}
+.rm .bar>.seg-blocked{background:repeating-linear-gradient(90deg,var(--ink-muted) 0 3px,transparent 3px 6px)}
+.rm .bar>.seg-open{background:transparent;outline:1px dashed var(--ink-muted);outline-offset:-1px}
+
+.rm .wordmark{display:inline-flex;align-items:center;gap:8px;font:800 14px/1 var(--font-mono);letter-spacing:1px;color:var(--ink);text-decoration:none}
+.rm .icon{width:18px;height:18px;flex:0 0 auto}
+.rm .error{color:var(--danger);font-size:13px}
+.rm .success{font-size:13px}
+.rm .notice{border:var(--rule) solid var(--owner);background:var(--owner-bg);padding:10px 14px;margin-bottom:14px;font-size:13px}
+
+@media (prefers-reduced-motion:reduce){.rm *,.rm *::before,.rm *::after{transition-duration:0s!important;animation:none!important}}
