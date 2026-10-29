@@ -37,7 +37,7 @@ export function RoutePage({route}:{route:Route}){
  if(route.name==='room'){
   const room=rooms.find(r=>r.id===route.projectId);
   if(!room)return loaded?<p className="page-message">{t('room.notFound')}</p>:null;
-  return <RoomPage key={room.id} projectId={room.id} name={room.name} drawer={drawerFor(room.id,route.drawer)}/>;
+  return <RoomPage key={room.id} projectId={room.id} name={room.name} drawer={drawerFor(room.id,route.drawer)} drawerKey={route.drawer?JSON.stringify(route.drawer):''}/>;
  }
  return <p className="page-message">{t('route.notFound')}</p>;
 }

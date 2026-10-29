@@ -11,16 +11,17 @@ type Props={tables:Table[];projectId:string;compact:boolean;focusedMember?:strin
 export function Floor({tables,projectId,compact,focusedMember,onSelectMember,onAsk}:Props){
  const {t}=useI18n();
  const list=useRef<HTMLUListElement>(null),links=useRef<(HTMLAnchorElement|null)[]>([]);
- const frozen=useRef(false),latest=useRef(tables);
+ const hold=useRef({pointer:false,focus:false}),latest=useRef(tables);
+ const held=()=>hold.current.pointer||hold.current.focus;
  const [order,setOrder]=useState(()=>tables.map(x=>x.taskId));
  const [active,setActive]=useState(0);
  latest.current=tables;
  useEffect(()=>{
-  setOrder(previous=>frozen.current
+  setOrder(previous=>held()
    ?[...previous.filter(id=>tables.some(x=>x.taskId===id)),...tables.filter(x=>!previous.includes(x.taskId)).map(x=>x.taskId)]
    :tables.map(x=>x.taskId));
  },[tables]);
- const thaw=()=>{frozen.current=false;setOrder(latest.current.map(x=>x.taskId))};
+ const release=()=>{if(!held())setOrder(latest.current.map(x=>x.taskId))};
  const byId=new Map(tables.map(x=>[x.taskId,x]));
  const shown=order.map(id=>byId.get(id)).filter((x):x is Table=>!!x);
  // FLIP: a table that changed place slides from where it was; a new table grows out of
@@ -57,8 +58,8 @@ export function Floor({tables,projectId,compact,focusedMember,onSelectMember,onA
   setActive(target);links.current[target]?.focus();
  };
  return <ul ref={list} className={'tables'+(compact?' compact':'')} aria-label={t('room.floor')}
-  onFocus={()=>{frozen.current=true}} onBlur={e=>{if(!e.currentTarget.contains(e.relatedTarget as Node|null))thaw()}}
-  onMouseEnter={()=>{frozen.current=true}} onMouseLeave={()=>{if(!list.current?.contains(document.activeElement))thaw()}}>
+  onFocus={()=>{hold.current.focus=true}} onBlur={e=>{if(!e.currentTarget.contains(e.relatedTarget as Node|null)){hold.current.focus=false;release()}}}
+  onMouseEnter={()=>{hold.current.pointer=true}} onMouseLeave={()=>{hold.current.pointer=false;release()}}>
   {shown.map((table,i)=><TableCard key={table.taskId} ref={el=>{links.current[i]=el}} itemRef={el=>{if(el)items.current.set(table.taskId,el);else items.current.delete(table.taskId)}} table={table} projectId={projectId} compact={compact}
    dimmed={!!focusedMember&&!table.seats.some(s=>s.participantId===focusedMember)} tabIndex={i===Math.min(active,shown.length-1)?0:-1}
    focusedMember={focusedMember} onSelectMember={onSelectMember} onFocus={()=>setActive(i)} onKeyDown={e=>move(e,i)}/>)}

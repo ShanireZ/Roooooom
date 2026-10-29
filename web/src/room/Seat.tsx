@@ -1,13 +1,8 @@
 import {useI18n} from '../i18n/I18nProvider';
 import {formatDateTime,formatRelative} from '../i18n/format';
 import {useNow} from '../ui/RelativeTime';
-import type {Seat as SeatModel} from './floorModel';
+import {seatInitials,type Seat as SeatModel} from './floorModel';
 
-const initials=(name:string)=>{
- const words=name.trim().split(/\s+/).filter(Boolean);
- if(!words.length)return '?';
- return /^[A-Za-z0-9]/.test(words[0])?(words.length>1?words[0][0]+words[1][0]:words[0].slice(0,2)).toUpperCase():[...words[0]][0];
-};
 export function useSeatLabels(){
  const {t,locale}=useI18n(),now=useNow();
  const name=(s:SeatModel)=>(s.revoked?t('seat.revoked'):s.name)+(s.showShortId?' · '+s.shortId:'');
@@ -21,7 +16,7 @@ export function useSeatLabels(){
 export function Seat({seat,pressed,onSelect,compact=false,entering=false}:{seat:SeatModel;pressed:boolean;onSelect:(participantId:string)=>void;compact?:boolean;entering?:boolean}){
  const labels=useSeatLabels();
  return <button type="button" className={'seat'+(entering?' join':'')} data-stale={String(seat.stale||seat.ended)} aria-pressed={pressed} title={labels.title(seat)} onClick={()=>onSelect(seat.participantId)}>
-  <span className="avatar" style={{background:`var(--agent-${seat.color})`}} aria-hidden="true">{seat.revoked?'?':initials(seat.name)}</span>
+  <span className="avatar" style={{background:`var(--agent-${seat.color})`}} aria-hidden="true">{seat.revoked?'?':seatInitials(seat.name)}</span>
   <span className="seat-name" title={labels.name(seat)}>{labels.name(seat)}</span>
   {seat.role?<span className="seat-role">{labels.role(seat)}</span>:null}
   {compact?null:<span className="seat-sync">{labels.sync(seat)}</span>}

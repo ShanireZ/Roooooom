@@ -245,7 +245,7 @@ Tabs:
 
 ### 8.3 Request drawer
 
-Shows the request text, its state, the preparer seat with last synchronization, owner constraints, linked questions, and the linked task once converted. Manage covers reassigning the preparer to an active session and cancelling, both with a reason and today's fences. The raw record goes in Technical details.
+Shows the request text, its state, the preparer seat with last synchronization, owner constraints, linked questions, and the linked task once converted. Manage covers reassigning the preparer to an active session and cancelling, both with a reason and today's fences. Technical details hold the request identifier, version, preparation epoch, preparer session and linked task, not a second copy of the request.
 
 ### 8.4 Formal question drawer
 
@@ -272,7 +272,7 @@ For a resolved question, **Revise decision** opens the same form as a supersede.
 Shows:
 
 - the candidate's plain summary;
-- the owner's acceptance conditions as a checklist with each reported outcome;
+- the owner's acceptance conditions as a checklist with each reported outcome, and a link to change the acceptance rules in the task's Manage tab;
 - the untested scope;
 - the reporter's attribution;
 - the sentence "Accepting approves this exact version; later changes need acceptance again".
@@ -462,8 +462,8 @@ Stamps always pair text with an outline, so color never carries meaning alone.
 ## 14. States
 
 - **Loading**: dashed skeleton tables.
-- **Offline or read-only**: a top banner with the last synchronization time and **Reconnect**. Every write control is disabled with a reason, and the floor stays visible from the in-memory snapshot.
-- **Re-synchronizing**: an indicator in the top bar.
+- **Offline or read-only**: a top banner with the last synchronization time and **Reconnect**, shown once the disconnection lasts 1.5 seconds. Every write control is disabled with a reason, and the floor stays visible from the in-memory snapshot.
+- **Re-synchronizing**: an indicator in the top bar. The handshake on every load or reconnect shows no banner.
 - **Reset required**: a blocking banner with explicit recovery.
 - **Authorization lost**: back to the not-activated card.
 - **Stale form**: disabled, with Reopen.

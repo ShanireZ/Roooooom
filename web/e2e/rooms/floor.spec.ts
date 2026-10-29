@@ -118,3 +118,23 @@ test('a focused table keeps its position when a new owner flag arrives',async({p
  await page.evaluate(()=>(document.activeElement as HTMLElement|null)?.blur());
  await expect.poll(order).toEqual(['Alpha','Charlie','Bravo']);
 });
+
+test('a hovered floor stays held after keyboard focus leaves it',async({page,service,activate})=>{
+ await activate();
+ const p=await seedProject(page,service);
+ const cx=await enroll(page,service,p.id,'Codex');
+ const ids:Record<string,string>={};
+ for(const goal of ['Alpha','Bravo','Charlie']){const t=await seedTask(page,service,p,'integrator',goal);ids[goal]=t.id;await claimIntegrator(page,service,cx,t.id)}
+ await page.goto(service.origin+'/rooms/'+p.id);
+ const order=async()=>(await floorList(page).getByRole('link').allTextContents()).map(text=>['Alpha','Bravo','Charlie'].find(g=>text.includes(g)));
+ await expect.poll(order).toEqual(['Charlie','Bravo','Alpha']);
+ const bravo=floorList(page).getByRole('link',{name:/Bravo/});
+ await bravo.hover();await bravo.focus();
+ await askDecision(page,service,cx,ids.Alpha);
+ await expect(floorList(page).getByRole('listitem').filter({hasText:'Alpha'})).toContainText(m('flag.decision'));
+ await page.evaluate(()=>(document.activeElement as HTMLElement|null)?.blur());
+ await page.waitForTimeout(400);
+ expect(await order()).toEqual(['Charlie','Bravo','Alpha']);
+ await page.mouse.move(5,5);
+ await expect.poll(order).toEqual(['Alpha','Charlie','Bravo']);
+});

@@ -65,3 +65,11 @@ export function buildFloor({tasks,requests,assignments,participants,sessions,nee
  const lobby=participants.filter(p=>!busy.has(p.id)).map(p=>seat(p.id,latestSession(p.id),''));
  return {notes,tables,density:tables.length>COMPACT_AFTER?'compact':'comfortable',cabinet:{doneCount:done.length,recent:done.slice(0,3).map(t=>({taskId:t.id,goal:t.goal}))},lobby};
 }
+
+// Two letters for a Latin name, otherwise the first character as the reader sees it
+// (a grapheme, so an emoji sequence stays whole).
+export function seatInitials(name:string):string{
+ const words=name.trim().split(/\s+/).filter(Boolean);
+ if(!words.length)return '?';
+ return /^[A-Za-z0-9]/.test(words[0])?(words.length>1?words[0][0]+words[1][0]:words[0].slice(0,2)).toUpperCase():new Intl.Segmenter(undefined,{granularity:'grapheme'}).segment(words[0])[Symbol.iterator]().next().value?.segment??'?';
+}

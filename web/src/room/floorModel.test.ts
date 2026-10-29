@@ -1,5 +1,5 @@
 import {describe,expect,it} from 'vitest';
-import {buildFloor,COMPACT_AFTER,STALE_AFTER_MS,type FloorInput} from './floorModel';
+import {buildFloor,COMPACT_AFTER,seatInitials,STALE_AFTER_MS,type FloorInput} from './floorModel';
 
 const now=new Date('2026-10-29T12:00:00Z');
 const ago=(ms:number)=>new Date(now.getTime()-ms).toISOString();
@@ -88,5 +88,19 @@ describe('buildFloor',()=>{
   expect(floor).toMatchObject({density:'compact',cabinet:{doneCount:200}});
   expect(floor.tables).toHaveLength(30);
   expect(floor.cabinet.recent.map(r=>r.taskId)).toEqual(['d0','d1','d2']);
+ });
+});
+
+describe('seat initials',()=>{
+ it('use two letters for Latin names and the first character otherwise',()=>{
+  expect(seatInitials('Claude Code')).toBe('CC');
+  expect(seatInitials('codex')).toBe('CO');
+  expect(seatInitials('张三')).toBe('张');
+  expect(seatInitials('  ')).toBe('?');
+ });
+ it('keep a multi-code-point emoji whole',()=>{
+  expect(seatInitials('👩‍💻 Dev')).toBe('👩‍💻');
+  expect(seatInitials('🇯🇵 Bot')).toBe('🇯🇵');
+  expect(seatInitials('👍🏽 Agent')).toBe('👍🏽');
  });
 });

@@ -24,6 +24,7 @@
 .rm .needs-items a{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px var(--sp-3);align-items:start;padding:10px 8px;margin:0 -8px;border-bottom:var(--hair) dashed var(--ink-2);text-decoration:none;transition:background-color var(--dur-quick)}
 .rm .needs-items a:hover,.rm .needs-items a:focus-visible{background:var(--paper)}
 .rm .needs-summary{overflow-wrap:anywhere;line-height:1.4}
+.rm .needs-reason{grid-column:2;font-size:var(--fs-sm)}
 .rm .needs-since{grid-column:2}
 .rm .banner{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:8px var(--sp-4);background:var(--owner-bg);border-bottom:var(--rule) solid var(--owner);font-size:var(--fs-sm);animation:rm-in var(--dur-base) var(--ease-out)}
 .rm .banner button{margin-left:auto;min-height:40px}

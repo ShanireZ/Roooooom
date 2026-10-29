@@ -123,3 +123,29 @@ test('destructive actions need a reason, an explicit confirmation and danger sty
  await confirm.click();
  await expect.poll(async()=>(await ownerRead(page,service,'task',task.id)).phase).toBe('cancelled');
 });
+
+test('opening a table while the full task editor is open shows that table',async({page,service,activate})=>{
+ await activate();
+ const p=await seedProject(page,service),task=await seedTask(page,service,p,'integrator','Open table');
+ const room=service.origin+'/rooms/'+p.id;
+ await page.goto(room);
+ await page.getByRole('button',{name:m('composer.fullSpec')}).click();
+ const editor=page.getByRole('dialog',{name:m('create.title')});
+ await expect(editor).toBeVisible();
+ await page.getByRole('list',{name:m('room.floor')}).getByRole('link',{name:/Open table/}).click();
+ await expect(page).toHaveURL(new RegExp('/rooms/'+p.id+'/tasks/'+task.id));
+ await expect(editor).toHaveCount(0);
+ await expect(drawer(page)).toContainText('Open table');
+});
+
+test('request technical details hold identifiers, not the whole request again',async({page,service,activate})=>{
+ await activate();
+ const p=await seedProject(page,service);
+ const r=await ownerCommand(page,service,'request.create',{projectId:p.id,text:'Show only identifiers',constraints:['Keep the login method']});
+ await page.goto(service.origin+'/rooms/'+p.id+'/requests/'+r.id);
+ await drawer(page).getByText(m('fold.technical')).click();
+ const details=drawer(page).locator('.tech');
+ await expect(details).toContainText(r.id);
+ await expect(details).not.toContainText('Show only identifiers');
+ await expect(details).not.toContainText('Keep the login method');
+});

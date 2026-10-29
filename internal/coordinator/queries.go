@@ -98,7 +98,7 @@ func (s *Service) Read(ctx context.Context, a model.Actor, q model.Query) (view 
 			if e = s.taskView(tx, &task); e != nil {
 				return e
 			}
-			times, e := taskTimes(tx, task.ProjectID)
+			times, e := s.taskTimes(tx, task.ProjectID)
 			if e != nil {
 				return e
 			}
@@ -268,7 +268,7 @@ func (s *Service) Read(ctx context.Context, a model.Actor, q model.Query) (view 
 				}
 				times, ok := timesByProject[task.ProjectID]
 				if !ok {
-					if times, e = taskTimes(tx, task.ProjectID); e != nil {
+					if times, e = s.taskTimes(tx, task.ProjectID); e != nil {
 						return e
 					}
 					timesByProject[task.ProjectID] = times

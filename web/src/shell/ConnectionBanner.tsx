@@ -1,3 +1,4 @@
+import {useEffect,useState} from 'react';
 import {useWorkspaceEvents} from '../api/events';
 import {useI18n} from '../i18n/I18nProvider';
 import {RelativeTime} from '../ui/RelativeTime';
@@ -9,10 +10,18 @@ export function ConnectionIndicator(){
  return <span className={'conn-state conn-'+(events.connected?'online':events.connection)}>{label}</span>;
 }
 // While disconnected the floor stays visible from the in-memory snapshot and writes are disabled.
+// The banner waits SETTLE_MS: the handshake on every load or reconnect is not an outage.
+const SETTLE_MS=1500;
 export function ConnectionBanner({retry,busy}:{retry:()=>void;busy:boolean}){
- const {t}=useI18n(),events=useWorkspaceEvents();
+ const {t}=useI18n(),events=useWorkspaceEvents(),[lasting,setLasting]=useState(false);
+ useEffect(()=>{
+  setLasting(false);
+  if(events.connected)return;
+  const timer=setTimeout(()=>setLasting(true),SETTLE_MS);
+  return()=>clearTimeout(timer);
+ },[events.connected]);
  if(events.resetRequired)return <div className="banner banner-alert" role="alert"><span>{t('shell.resetRequired')}</span><button type="button" onClick={retry} disabled={busy}>{t('shell.reconnect')}</button></div>;
- if(events.connected)return null;
+ if(events.connected||!lasting)return null;
  return <div className="banner" role="status">
   <strong>{t('shell.readOnly')}</strong>
   <span className="muted">{events.lastSyncedAt?<>{t('shell.lastSync')} <RelativeTime iso={events.lastSyncedAt}/></>:t('shell.loadingState')}</span>

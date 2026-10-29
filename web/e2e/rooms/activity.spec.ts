@@ -128,3 +128,26 @@ test('loading earlier activity keeps the reader in place instead of jumping to t
  const fromBottom=await list.evaluate(el=>el.scrollHeight-el.scrollTop-el.clientHeight);
  expect(fromBottom).toBeGreaterThan(1000);
 });
+
+test('a kept request whose result is unknown can be discarded',async({page,service,activate})=>{
+ await activate();
+ const p=await seedProject(page,service);
+ await page.goto(service.origin+'/rooms/'+p.id);
+ let lost=true;
+ await page.route('**/commands/request.create',async route=>{if(lost){lost=false;await route.abort('failed')}else await route.continue()});
+ await page.getByRole('button',{name:m('room.ask')}).click();
+ const text=page.getByLabel(m('composer.askLabel'));
+ await text.fill('A request I no longer want');
+ await page.getByRole('button',{name:m('composer.askSubmit')}).click();
+ const discard=page.getByRole('button',{name:m('composer.discard')});
+ await expect(discard).toBeEnabled({timeout:10000});
+ await discard.click();
+ await expect(page.getByText(m('composer.discarded'))).toBeVisible();
+ await expect(page.getByRole('button',{name:m('composer.retry')})).toHaveCount(0);
+ await expect(text).toHaveValue('');
+ await expect(text).toBeEditable();
+ await text.fill('The request I want');
+ await page.getByRole('button',{name:m('composer.askSubmit')}).click();
+ await expect(page.getByRole('list',{name:m('room.door')})).toContainText('The request I want');
+ expect((await ownerRead(page,service,'requests',undefined,p.id)).map((r:{text:string})=>r.text)).toEqual(['The request I want']);
+});

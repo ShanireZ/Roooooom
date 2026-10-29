@@ -17,6 +17,8 @@ type Service struct {
 	ids                 model.IDSource
 	observationMu       sync.Mutex
 	observations        map[model.ID]observation
+	timesMu             sync.Mutex
+	timesCache          map[model.ID]cachedTimes
 	waitRegistered      func()
 	waitIdle            func()
 	metrics             appruntime.Metrics
@@ -34,7 +36,7 @@ func New(st *store.Store, clock model.Clock, ids model.IDSource, options ...Opti
 	if ids == nil {
 		ids = model.RandomIDs{}
 	}
-	s := &Service{store: st, clock: clock, ids: ids, observations: map[model.ID]observation{}}
+	s := &Service{store: st, clock: clock, ids: ids, observations: map[model.ID]observation{}, timesCache: map[model.ID]cachedTimes{}}
 	if len(options) > 0 {
 		s.repositoryInspector = options[0].RepositoryInspector
 	}

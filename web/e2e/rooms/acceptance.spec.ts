@@ -91,3 +91,20 @@ test('archive search and status filter find completed work among many records',a
  await drawer.getByRole('link',{name:/Unique finished report/}).click();
  await expect(page).toHaveURL(service.origin+'/rooms/'+p.id+'/tasks/'+task.id);
 });
+
+test('after accepting, Next item leads on; the rules link opens the task Manage tab',async({page,service,activate})=>{
+ await activate();
+ const {p,task}=await candidateTask(page,service);
+ await ownerCommand(page,service,'task.create',{projectId:p.id,goal:'Risky change',scope:['fixture only'],nonScope:[],authorityRefs:['synthetic://owner'],risk:'high',acceptancePolicy:{mode:'integrator',conditions:['tests pass']},collaboratorLimit:0});
+ const [question]=await ownerRead(page,service,'decisions',undefined,p.id);
+ const room=service.origin+'/rooms/'+p.id;
+ await page.goto(room+'/acceptance/'+task.id);
+ const drawer=page.getByRole('dialog');
+ await drawer.getByRole('link',{name:m('acceptance.editRules')}).click();
+ await expect(page).toHaveURL(room+'/tasks/'+task.id+'/manage');
+ await page.goto(room+'/acceptance/'+task.id);
+ await drawer.getByRole('button',{name:m('acceptance.accept')}).click();
+ await expect(drawer).toContainText(m('acceptance.accepted'));
+ await drawer.getByRole('button',{name:m('decision.next')}).click();
+ await expect(page).toHaveURL(room+'/decisions/'+question.id);
+});

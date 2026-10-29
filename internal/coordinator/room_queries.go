@@ -78,7 +78,6 @@ func (s *Service) needsYou(tx readTx, project model.ID) ([]needsYouItem, error) 
 	if e != nil {
 		return nil, e
 	}
-	timesByProject := map[model.ID]map[model.ID]activityTimes{}
 	for _, id := range ids {
 		task, e := loadTask(tx, id)
 		if e != nil {
@@ -87,14 +86,6 @@ func (s *Service) needsYou(tx readTx, project model.ID) ([]needsYouItem, error) 
 		if e = s.taskView(tx, &task); e != nil {
 			return nil, e
 		}
-		times, ok := timesByProject[task.ProjectID]
-		if !ok {
-			if times, e = taskTimes(tx, task.ProjectID); e != nil {
-				return nil, e
-			}
-			timesByProject[task.ProjectID] = times
-		}
-		updated := times[task.ID].Updated
 		if task.AcceptancePolicy.Mode == "human" && task.CurrentCandidateID != "" {
 			ready, since, e := humanAcceptanceReady(tx, task)
 			if e != nil {
@@ -108,7 +99,12 @@ func (s *Service) needsYou(tx readTx, project model.ID) ([]needsYouItem, error) 
 			if code != "integrator-revoked" && code != "integrator-session-ended" && !strings.HasPrefix(code, "pending-reconciliation:") {
 				continue
 			}
-			since := updated
+			// Task times are read only for the rare task that carries a blocker.
+			times, e := s.taskTimes(tx, task.ProjectID)
+			if e != nil {
+				return nil, e
+			}
+			since := times[task.ID].Updated
 			if code == "integrator-session-ended" {
 				if seen := s.lastSeen(tx, task.IntegratorSessionID); !seen.IsZero() {
 					since = seen

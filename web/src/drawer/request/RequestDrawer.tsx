@@ -39,7 +39,7 @@ export function RequestDrawer({projectId,requestId}:{projectId:string;requestId:
   {r.constraints?.length?<section className="drawer-section"><h3>{t('task.constraints')}</h3><List items={r.constraints}/></section>:null}
   {questions.data?.length?<section className="drawer-section"><h3>{t('request.questions')}</h3><ul className="plain-list">{questions.data.map(q=><li key={q.id}><Stamp kind="formal"/> <a href={routePath({name:'room',projectId,drawer:{kind:'decision',id:q.id}})} data-local>{localizeSystemQuestion(q,t).question}</a></li>)}</ul></section>:null}
   {open?<details className="fold"><summary>{t('request.manage')}</summary><RequestControls request={r} sessions={sessions.data??[]} names={names} fresh={record.fresh&&sessions.fresh}/></details>:null}
-  <TechnicalDetails><pre>{JSON.stringify(r,null,2)}</pre></TechnicalDetails>
+  <TechnicalDetails><p>request {r.id} · v{r.version} · epoch {r.preparationEpoch} · session {r.preparerSessionId||'—'}{r.taskId?' · task '+r.taskId:''}</p></TechnicalDetails>
  </Drawer>;
 }
 

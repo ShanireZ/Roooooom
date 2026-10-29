@@ -1,5 +1,6 @@
 import {useEffect,useRef,useState} from 'react';
 import {localizedSummary} from '../drawer/decision/systemQuestions';
+import {blockingKey} from '../drawer/task/blocking';
 import {useI18n} from '../i18n/I18nProvider';
 import {useBump} from '../ui/motion';
 import {Stamp} from '../ui/Stamp';
@@ -7,6 +8,8 @@ import {RelativeTime} from '../ui/RelativeTime';
 import {needsYouKey,needsYouPath,type NeedsYouItem} from './useNeedsYou';
 
 type Room={id:string;name:string};
+// A blocker says why it blocks; the summary already names the table or request.
+const reason=(item:NeedsYouItem)=>item.kind==='blocker'&&item.code?blockingKey(item.code):undefined;
 // A popover list grouped by room; choosing an item opens its drawer.
 export function NeedsYou({items,rooms}:{items:NeedsYouItem[];rooms:Room[]}){
  const {t,tn}=useI18n(),panel=useRef<HTMLDivElement>(null),[open,setOpen]=useState(false);
@@ -36,6 +39,7 @@ export function NeedsYou({items,rooms}:{items:NeedsYouItem[];rooms:Room[]}){
     <ul className="needs-items">{items.filter(i=>i.projectId===room.id).map(item=><li key={needsYouKey(item)}>
      <a href={needsYouPath(item)} data-local onClick={()=>panel.current?.hidePopover()}>
       <Stamp kind={item.kind==='decision'?'formal':item.kind}/> <span className="needs-summary">{localizedSummary(item,t)}</span>
+      {reason(item)?<span className="muted needs-reason">{t(reason(item)!)}</span>:null}
       <span className="muted needs-since"><RelativeTime iso={item.since}/></span>
      </a>
     </li>)}</ul>

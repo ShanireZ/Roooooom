@@ -46,3 +46,14 @@ test('/ returns to the last visited room',async({page,service,activate})=>{
  await page.goto(service.origin+'/');
  await expect(page).toHaveURL(service.origin+'/rooms/'+second.id);
 });
+
+test('a legacy link opened while disconnected says it opens when the connection returns',async({page,service,activate})=>{
+ await activate();
+ const p=await seedProject(page,service),task=await seedTask(page,service,p,'integrator','Offline legacy');
+ await page.goto(service.origin+'/rooms/'+p.id);
+ await expect(page.locator('.conn-state.conn-online')).toBeVisible();
+ await service.stop();
+ await expect(page.getByRole('status').filter({hasText:m('shell.readOnly')})).toBeVisible({timeout:15000});
+ await page.evaluate(id=>{history.pushState(null,'','/tasks/'+id);dispatchEvent(new PopStateEvent('popstate'))},task.id);
+ await expect(page.getByText(m('shell.waitingLink'))).toBeVisible();
+});

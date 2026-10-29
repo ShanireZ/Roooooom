@@ -1,10 +1,12 @@
 import {useEffect,useRef,useState,type ReactNode} from 'react';
 import './room.css';
+import {navigate} from '../App';
 import {useI18n} from '../i18n/I18nProvider';
 import {Feedback} from '../ui/Feedback';
 import {OpenDoorButton} from '../drawer/settings/RoomSettingsDrawer';
 import {TaskCreateDrawer} from '../drawer/task/TaskCreateDrawer';
 import {rememberRoom} from '../shell/home';
+import {routePath} from '../shell/routes';
 import {useRooms} from '../shell/Shell';
 import {Activity} from './Activity';
 import {Cabinet} from './Cabinet';
@@ -16,11 +18,14 @@ import {useRoomData} from './useRoomData';
 
 // The room: door, floor, cabinet and lobby, with the activity column and the drawer beside it.
 // Below 1200px a Floor | Activity switch shows one panel at a time.
-export function RoomPage({projectId,name,drawer}:{projectId:string;name:string;drawer?:ReactNode}){
+// `drawerKey` names the URL's drawer; opening one closes the full task editor, which has no URL.
+export function RoomPage({projectId,name,drawer,drawerKey=''}:{projectId:string;name:string;drawer?:ReactNode;drawerKey?:string}){
  const {t}=useI18n(),room=useRoomData(projectId),project=useRooms().rooms.find(r=>r.id===projectId);
  const [focusedMember,setFocusedMember]=useState<string>(),[view,setView]=useState<'floor'|'activity'>('floor'),[creating,setCreating]=useState(false);
  const composer=useRef<ComposerHandle>(null);
  useEffect(()=>rememberRoom(projectId),[projectId]);
+ useEffect(()=>{if(drawerKey)setCreating(false)},[drawerKey]);
+ const create=()=>{if(drawerKey)navigate(routePath({name:'room',projectId}));setCreating(true)};
  const select=(id:string)=>setFocusedMember(current=>current===id?undefined:id);
  const ask=()=>{setView('activity');composer.current?.ask()};
  const {floor}=room;
@@ -53,7 +58,7 @@ export function RoomPage({projectId,name,drawer}:{projectId:string;name:string;d
   </div>
   <aside className="room-activity">
    <Activity projectId={projectId}/>
-   <Composer ref={composer} projectId={projectId} participants={room.participants} onCreateTask={()=>setCreating(true)}/>
+   <Composer ref={composer} projectId={projectId} participants={room.participants} onCreateTask={create}/>
   </aside>
   {creating?<TaskCreateDrawer projectId={projectId} onClose={()=>setCreating(false)}/>:drawer}
  </section>;

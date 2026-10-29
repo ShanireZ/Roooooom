@@ -1,4 +1,5 @@
 import {useEffect,useMemo} from 'react';
+import {useWorkspaceEvents} from '../api/events';
 import {useResource} from '../api/resource';
 import {navigate} from '../App';
 import {useI18n} from '../i18n/I18nProvider';
@@ -27,11 +28,12 @@ export function Replace({to}:{to:string}){
 
 // `/tasks/:id` and `/requests/:id` read the record to find its room.
 export function LegacyObject({kind,id}:{kind:'task'|'request';id:string}){
- const {t}=useI18n();
+ const {t}=useI18n(),events=useWorkspaceEvents();
  const record=useResource<{projectId:string}>('/api/v1/queries/'+kind+'?targetId='+encodeURIComponent(id));
  const projectId=record.data?.projectId;
  useEffect(()=>{
   if(projectId)navigate(routePath({name:'room',projectId,drawer:kind==='task'?{kind:'task',id,tab:'overview'}:{kind:'request',id}}),true);
  },[projectId,kind,id]);
- return record.error?<p className="page-message">{t(kind==='task'?'task.notFound':'request.notFound')}</p>:null;
+ if(record.error&&record.error!=='offline')return <p className="page-message">{t(kind==='task'?'task.notFound':'request.notFound')}</p>;
+ return <p className="page-message muted" role="status">{events.connected?t('task.loading'):t('shell.waitingLink')}</p>;
 }

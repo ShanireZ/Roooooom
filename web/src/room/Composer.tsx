@@ -58,6 +58,9 @@ function AskForm({projectId,participants,textRef,onCreateTask}:{projectId:string
    {uncertain&&action.error?<p className="notice">{t('composer.uncertain')}</p>:null}
    <div className="composer-actions">
     <button type="submit">{uncertain&&action.error?t('composer.retry'):t('composer.askSubmit')}</button>
+    {uncertain&&action.error?<button type="button" className="btn-ghost" onClick={e=>{
+     state.current={};setUncertain(false);setText('');setConditions('');e.currentTarget.form?.reset();action.setError('');action.setNotice(t('composer.discarded'));
+    }}>{t('composer.discard')}</button>:null}
     {onCreateTask?<button type="button" className="btn-text" onClick={onCreateTask}>{t('composer.fullSpec')}</button>:null}
    </div>
   </fieldset>

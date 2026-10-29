@@ -1,5 +1,5 @@
 import {test,expect} from '../fixture';
-import {ownerCommand,ownerRead,seedProject} from '../helpers';
+import {agentCommand,claimIntegrator,enroll,ownerCommand,ownerRead,seedProject,seedTask} from '../helpers';
 import {m} from '../i18n';
 
 test.use({locale:'en-US'});
@@ -43,4 +43,31 @@ test('an unknown room path shows not-found inside the shell',async({page,service
  await page.goto(service.origin+'/rooms/missing-room');
  await expect(page.getByText(m('room.notFound'))).toBeVisible();
  await expect(page.getByRole('navigation',{name:m('shell.rooms')})).toBeVisible();
+});
+
+test('Needs-you blockers say why the table or request is blocked',async({page,service,activate})=>{
+ await activate();
+ const p=await seedProject(page,service),a=await enroll(page,service,p.id,'Codex');
+ const task=await seedTask(page,service,p,'integrator','Blocked table');await claimIntegrator(page,service,a,task.id);
+ const request=await ownerCommand(page,service,'request.create',{projectId:p.id,text:'Blocked request'});
+ await agentCommand(a,'request.claim',{},request.id,{expectedVersion:request.version,claimEpoch:0});
+ await ownerCommand(page,service,'participant.revoke',{},a.participantId);
+ await page.goto(service.origin+'/rooms/'+p.id);
+ await page.getByRole('button',{name:new RegExp(m('shell.needsYou'))}).click();
+ const list=page.getByRole('list',{name:m('shell.needsYou')});
+ await expect(list.getByRole('link',{name:/Blocked table/})).toContainText(m('blocking.integratorRevoked'));
+ await expect(list.getByRole('link',{name:/Blocked request/})).toContainText(m('blocking.preparerRevoked'));
+});
+
+test('the read-only banner does not flash while the page first synchronizes',async({page,service,activate})=>{
+ await activate();
+ const p=await seedProject(page,service);
+ await page.addInitScript(()=>{
+  const w=window as unknown as {bannerSeen:boolean};w.bannerSeen=false;
+  new MutationObserver(()=>{if(document.querySelector('.banner[role=status]'))w.bannerSeen=true}).observe(document,{childList:true,subtree:true});
+ });
+ await page.goto(service.origin+'/rooms/'+p.id);
+ await expect(page.locator('.conn-state.conn-online')).toBeVisible();
+ await page.waitForTimeout(500);
+ expect(await page.evaluate(()=>(window as unknown as {bannerSeen:boolean}).bannerSeen)).toBe(false);
 });
