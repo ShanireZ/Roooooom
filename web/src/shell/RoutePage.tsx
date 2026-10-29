@@ -9,7 +9,7 @@ export function RoutePage({route}:{route:Route}){
  if(route.name==='room'){
   const room=rooms.find(r=>r.id===route.projectId);
   if(!room)return loaded?<p className="page-message">{t('room.notFound')}</p>:null;
-  return <RoomPage key={room.id} projectId={room.id} name={room.name} route={route.drawer}/>;
+  return <RoomPage key={room.id} projectId={room.id} name={room.name}/>;
  }
  return <p className="page-message">{t('route.notFound')}</p>;
 }
