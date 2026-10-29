@@ -1,6 +1,6 @@
 # Owner interface redesign
 
-Status: proposed design, 2026-10-29. This document describes intended browser and owner-facing behavior; it is not an implementation or verification claim. Until it is implemented, [DESIGN.md](../DESIGN.md) §11 describes the shipped browser workflow. Protocol and authority rules in DESIGN.md are unchanged. Additive server reads, one owner preference command, and a possible forward schema migration are allowed only as described in §16.
+Status: design approved by the owner on 2026-10-29; not yet implemented. This document describes intended browser and owner-facing behavior; it is not an implementation or verification claim. Until it is implemented, [DESIGN.md](../DESIGN.md) §11 describes the shipped browser workflow. Protocol and authority rules in DESIGN.md are unchanged. Additive server reads, one owner preference command, and a possible forward schema migration are allowed only as described in §16.
 
 ## 1. Intent
 
