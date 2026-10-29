@@ -1,4 +1,5 @@
 import {useI18n} from '../i18n/I18nProvider';
+import {RequestDrawer} from '../drawer/request/RequestDrawer';
 import {TaskDrawer} from '../drawer/task/TaskDrawer';
 import {RoomPage} from '../room/RoomPage';
 import type {DrawerRoute,Route} from './routes';
@@ -7,6 +8,7 @@ import {useRooms} from './Shell';
 // The drawer for a room route; later tasks add the remaining drawer kinds.
 function drawerFor(projectId:string,drawer?:DrawerRoute){
  if(drawer?.kind==='task')return <TaskDrawer key={'task-'+drawer.id} projectId={projectId} taskId={drawer.id} tab={drawer.tab}/>;
+ if(drawer?.kind==='request')return <RequestDrawer key={'request-'+drawer.id} projectId={projectId} requestId={drawer.id}/>;
  return undefined;
 }
 

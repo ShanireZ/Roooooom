@@ -50,6 +50,7 @@ function AskForm({projectId,participants,textRef,onCreateTask}:{projectId:string
      <Area label={t('composer.constraints')} name="constraints"/>
      <Field label={t('composer.limit')} name="limit" type="number" min={0} max={64}/>
      <Select label={t('composer.integrator')} name="integrator" defaultValue=""><option value="">{t('composer.anyIntegrator')}</option>{participants.map(p=><option key={p.id} value={p.id}>{label(p,participants)}</option>)}</Select>
+     <p className="muted">{t('composer.integratorHint')}</p>
      <Area label={t('composer.conditions')} name="conditions" value={conditions} onChange={e=>setConditions(e.target.value)}/>
      {conditions.trim()?<Select label={t('composer.acceptor')} name="acceptor" defaultValue="integrator"><option value="integrator">{t('acceptor.integrator')}</option><option value="human">{t('acceptor.human')}</option></Select>:null}
     </fieldset>

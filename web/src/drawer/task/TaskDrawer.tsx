@@ -8,11 +8,13 @@ import {Drawer} from '../Drawer';
 import {DiscussionTab} from './DiscussionTab';
 import {EvidenceTab} from './EvidenceTab';
 import {HistoryTab} from './HistoryTab';
+import {ManageTab} from './ManageTab';
+import {WorkTab} from './WorkTab';
 import {OverviewTab} from './OverviewTab';
 import {nextStep} from './nextStep';
 
 export type TaskView=Schema['Task'];
-const TABS:TaskTab[]=['overview','evidence','discussion','history'];
+const TABS:TaskTab[]=['overview','work','evidence','discussion','history','manage'];
 
 export function useNames(projectId:string){
  const people=useCollection<Schema['ParticipantView']>('/api/v1/queries/participants?projectId='+encodeURIComponent(projectId));
@@ -27,7 +29,7 @@ export function TaskDrawer({projectId,taskId,tab}:{projectId:string;taskId:strin
  const task=useResource<TaskView>('/api/v1/queries/task?targetId='+encodeURIComponent(taskId));
  const assignments=useCollection<Schema['Assignment']>('/api/v1/queries/assignments?targetId='+encodeURIComponent(taskId));
  const needs=useCollection<Schema['NeedsYouItem']>('/api/v1/queries/needs-you');
- const {names}=useNames(projectId);
+ const {names,people}=useNames(projectId);
  const close=()=>navigate(routePath({name:'room',projectId}));
  if(!task.data)return <Drawer title={task.error?t('task.notFound'):t('task.loading')} onClose={close}><Feedback error={task.error}/></Drawer>;
  const tk=task.data,step=nextStep({task:tk,assignments:assignments.data??[],needsYou:needs.data??[],names});
@@ -42,6 +44,6 @@ export function TaskDrawer({projectId,taskId,tab}:{projectId:string;taskId:strin
    {TABS.map(x=><a key={x} href={routePath({name:'room',projectId,drawer:{kind:'task',id:taskId,tab:x}})} data-local aria-current={x===shown?'page':undefined}>{t(('task.tab.'+x) as 'task.tab.overview')}</a>)}
   </nav>
   <Feedback error={task.error}/>
-  {shown==='overview'?<OverviewTab task={tk}/>:shown==='evidence'?<EvidenceTab task={tk} names={names}/>:shown==='discussion'?<DiscussionTab task={tk} names={names}/>:<HistoryTab task={tk}/>}
+  {shown==='overview'?<OverviewTab task={tk}/>:shown==='work'?<WorkTab task={tk} names={names} fresh={task.fresh}/>:shown==='manage'?<ManageTab task={tk} names={names} people={people} fresh={task.fresh}/>:shown==='evidence'?<EvidenceTab task={tk} names={names}/>:shown==='discussion'?<DiscussionTab task={tk} names={names}/>:<HistoryTab task={tk}/>}
  </Drawer>;
 }
