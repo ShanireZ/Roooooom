@@ -44,13 +44,13 @@ The first-use flow opens a private activation page, then guides you through sele
 
 ## Daily workflow
 
-1. Add a request in a project, or ask an already connected agent to register work.
+1. Leave a request in a room, or ask an already connected agent to register work.
 2. An agent claims preparation, reads project authorities, and asks formal questions when needed.
 3. It converts the request to one complete task and coordinates additional collaborators.
 4. Workers deliver exact commits and checks; the integration agent reviews and integrates them.
-5. Answer decisions or a ready human acceptance on the attention page. Completion retains its evidence.
+5. Answer decisions or a ready human acceptance from Needs you. Completion retains its evidence.
 
-The browser's main navigation has Projects and Needs my attention. Complete specifications, history, and technical management remain available on demand. Chat is discussion, not approval.
+Each project is a room: requests wait as notes at the door, tasks are tables with the agents responsible for them, and finished work goes to the file cabinet. Needs you gathers what only you can decide across rooms. Complete specifications, history, and technical management stay one drawer away. The interface is available in the same four languages as this README. Chat is discussion, not approval.
 
 ## Development and privacy
 

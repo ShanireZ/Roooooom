@@ -1,12 +1,12 @@
 # Owner interface redesign
 
-Status: design approved by the owner on 2026-10-29; not yet implemented. This document describes intended browser and owner-facing behavior; it is not an implementation or verification claim. Until it is implemented, [DESIGN.md](../DESIGN.md) §11 describes the shipped browser workflow. Protocol and authority rules in DESIGN.md are unchanged. Additive server reads, one owner preference command, and a possible forward schema migration are allowed only as described in §16.
+Status: design approved by the owner on 2026-10-29. Implemented in 8a5fbe8; [DESIGN.md](../DESIGN.md) §11 is authoritative for shipped behavior. Protocol and authority rules in DESIGN.md are unchanged. Additive server reads, one owner preference command, and a possible forward schema migration are allowed only as described in §16.
 
 ## 1. Intent
 
 The owner's job in Roooooom is small and recurring: leave a short request, see who is responsible for what and where it is stuck, answer formal questions, accept results when asked, and occasionally manage people, integrations and recovery. Agents do everything else in their own hosts.
 
-The current browser workflow already limits daily navigation to Projects and Needs my attention, but the owner reported four problems with it:
+The previous browser workflow already limited daily navigation to Projects and Needs my attention, but the owner reported four problems with it:
 
 1. It is hard to see what agents are doing: who holds which responsibility, where work is stuck, and what happens next.
 2. Decisions and acceptance are too technical: candidate IDs, SHAs, epochs and versions dominate the screen.
