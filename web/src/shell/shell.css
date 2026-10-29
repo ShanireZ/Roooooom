@@ -30,3 +30,10 @@
  .rm .needs-panel{inset:0;width:100vw;max-height:none;height:100dvh;box-shadow:none;border:0}
  .rm .card{margin:24px 16px;padding:22px}
 }
+.rm .setup{max-width:640px}
+.rm .setup h1{font-size:22px}
+.rm .join{margin:12px 0}
+.rm .join-instructions{font-family:var(--font-mono);font-size:12px;line-height:1.8;padding:12px;background:var(--paper-2);border:1px solid var(--ink-muted);white-space:pre-wrap;overflow-wrap:anywhere}
+.rm .pulse{display:inline-block;width:9px;height:9px;margin-inline-end:6px;border:var(--rule) solid var(--ink);border-radius:50%;vertical-align:middle;animation:rm-pulse 1.4s infinite}
+@keyframes rm-pulse{50%{background:var(--ink)}}
+.rm .door-banner{display:flex;flex-wrap:wrap;align-items:center;gap:10px}

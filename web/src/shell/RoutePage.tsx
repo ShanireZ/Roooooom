@@ -4,7 +4,9 @@ import {ArchiveDrawer} from '../drawer/archive/ArchiveDrawer';
 import {DecisionDrawer} from '../drawer/decision/DecisionDrawer';
 import {RequestDrawer} from '../drawer/request/RequestDrawer';
 import {TaskDrawer} from '../drawer/task/TaskDrawer';
+import {RoomSettingsDrawer} from '../drawer/settings/RoomSettingsDrawer';
 import {RoomPage} from '../room/RoomPage';
+import {NewRoom} from '../setup/NewRoom';
 import type {DrawerRoute,Route} from './routes';
 import {useRooms} from './Shell';
 
@@ -15,11 +17,13 @@ function drawerFor(projectId:string,drawer?:DrawerRoute){
  if(drawer?.kind==='decision')return <DecisionDrawer key={'decision-'+drawer.id} projectId={projectId} decisionId={drawer.id}/>;
  if(drawer?.kind==='acceptance')return <AcceptanceDrawer key={'acceptance-'+drawer.taskId} projectId={projectId} taskId={drawer.taskId}/>;
  if(drawer?.kind==='archive')return <ArchiveDrawer key="archive" projectId={projectId}/>;
+ if(drawer?.kind==='settings')return <RoomSettingsDrawer key="settings" projectId={projectId} section={drawer.section}/>;
  return undefined;
 }
 
 export function RoutePage({route}:{route:Route}){
  const {t}=useI18n(),{rooms,loaded}=useRooms();
+ if(route.name==='newRoom')return <NewRoom/>;
  if(route.name==='room'){
   const room=rooms.find(r=>r.id===route.projectId);
   if(!room)return loaded?<p className="page-message">{t('room.notFound')}</p>:null;

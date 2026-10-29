@@ -2,7 +2,9 @@ import {useRef,useState,type ReactNode} from 'react';
 import './room.css';
 import {useI18n} from '../i18n/I18nProvider';
 import {Feedback} from '../ui/Feedback';
+import {OpenDoorButton} from '../drawer/settings/RoomSettingsDrawer';
 import {TaskCreateDrawer} from '../drawer/task/TaskCreateDrawer';
+import {useRooms} from '../shell/Shell';
 import {Activity} from './Activity';
 import {Cabinet} from './Cabinet';
 import {Composer,type ComposerHandle} from './Composer';
@@ -14,7 +16,7 @@ import {useRoomData} from './useRoomData';
 // The room: door, floor, cabinet and lobby, with the activity column and the drawer beside it.
 // Below 1200px a Floor | Activity switch shows one panel at a time.
 export function RoomPage({projectId,name,drawer}:{projectId:string;name:string;drawer?:ReactNode}){
- const {t}=useI18n(),room=useRoomData(projectId);
+ const {t}=useI18n(),room=useRoomData(projectId),project=useRooms().rooms.find(r=>r.id===projectId);
  const [focusedMember,setFocusedMember]=useState<string>(),[view,setView]=useState<'floor'|'activity'>('floor'),[creating,setCreating]=useState(false);
  const composer=useRef<ComposerHandle>(null);
  const select=(id:string)=>setFocusedMember(current=>current===id?undefined:id);
@@ -31,6 +33,7 @@ export function RoomPage({projectId,name,drawer}:{projectId:string;name:string;d
     <h1 className="room-title">{name}</h1>
     {focusedMember?<button type="button" className="btn-ghost" onClick={()=>setFocusedMember(undefined)}>{t('seat.clearFocus')}{focused?' · '+(focused.name||t('seat.revoked')):''}</button>:null}
    </header>
+   {project&&project.enrollmentEnabled===false?<div className="notice door-banner" role="status"><span>{t('door.banner')}</span> <OpenDoorButton project={project}/></div>:null}
    <Feedback error={room.error}/>
    <div className={'floor-plan'+(floor.density==='compact'?' compact':'')}>
     <div className="door-col"><h2 className="label">{t('room.door')}</h2><Door notes={floor.notes} projectId={projectId}/></div>
