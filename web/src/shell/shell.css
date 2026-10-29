@@ -37,3 +37,12 @@
 .rm .pulse{display:inline-block;width:9px;height:9px;margin-inline-end:6px;border:var(--rule) solid var(--ink);border-radius:50%;vertical-align:middle;animation:rm-pulse 1.4s infinite}
 @keyframes rm-pulse{50%{background:var(--ink)}}
 .rm .door-banner{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.rm .settings-page{max-width:720px;margin:24px auto}
+.rm .settings-page h1{font-size:22px}
+.rm .settings-page section{border-top:var(--rule) solid var(--ink);padding-top:12px;margin-top:20px}
+.rm .storage{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.rm .storage meter{width:min(240px,100%);height:12px}
+.rm .storage.warning{color:var(--owner);background:var(--owner-bg);border:var(--rule) double var(--owner);padding:8px}
+.rm .private-path{overflow-wrap:anywhere}
+.rm .about{display:grid;grid-template-columns:max-content 1fr;gap:4px 16px}
+.rm .about dd{margin:0;overflow-wrap:anywhere}

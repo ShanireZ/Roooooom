@@ -7,6 +7,7 @@ import {TaskDrawer} from '../drawer/task/TaskDrawer';
 import {RoomSettingsDrawer} from '../drawer/settings/RoomSettingsDrawer';
 import {RoomPage} from '../room/RoomPage';
 import {NewRoom} from '../setup/NewRoom';
+import {SystemSettings} from '../settings/SystemSettings';
 import type {DrawerRoute,Route} from './routes';
 import {useRooms} from './Shell';
 
@@ -24,6 +25,7 @@ function drawerFor(projectId:string,drawer?:DrawerRoute){
 export function RoutePage({route}:{route:Route}){
  const {t}=useI18n(),{rooms,loaded}=useRooms();
  if(route.name==='newRoom')return <NewRoom/>;
+ if(route.name==='settings')return <SystemSettings/>;
  if(route.name==='room'){
   const room=rooms.find(r=>r.id===route.projectId);
   if(!room)return loaded?<p className="page-message">{t('room.notFound')}</p>:null;
