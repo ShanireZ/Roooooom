@@ -8,6 +8,11 @@ import {DecisionPage} from './features/decisions/DecisionPage';
 import {SettingsPage} from './features/settings/SettingsPage';
 import {ProjectSetup} from './features/projects/ProjectSetup';
 import {RequestPage} from './features/requests/RequestPage';
+import {I18nProvider} from './i18n/I18nProvider';
+import {NotActivated} from './shell/NotActivated';
+import {parseRoute} from './shell/routes';
+import {RoutePage} from './shell/RoutePage';
+import {Shell} from './shell/Shell';
 
 const Owner=createContext<OwnerContext|undefined>(undefined);
 export const useOwner=()=>useContext(Owner);
@@ -39,6 +44,10 @@ export function App(){
   catch(error){setProblem(error instanceof ApiError?error.code:'offline')}
   finally{setLoading(false)}
  };
+ if(path==='/rooms'||path.startsWith('/rooms/'))return <Owner.Provider value={owner}><I18nProvider ownerLanguage={owner?.ownerLanguage}><div onClick={follow}>
+  {owner?<Shell route={parseRoute(path)} retry={()=>void retry()} busy={loading}><RoutePage route={parseRoute(path)}/></Shell>
+   :<div className="rm"><NotActivated checking={loading} offline={problem==='offline'} retry={()=>void retry()}/></div>}
+ </div></I18nProvider></Owner.Provider>;
  let title='專案';
  if(path==='/setup'||path.startsWith('/setup/'))title='本機設定';
  else if(path==='/decisions')title='待我處理';

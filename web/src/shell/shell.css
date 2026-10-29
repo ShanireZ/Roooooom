@@ -1,0 +1,32 @@
+.rm .topbar{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:16px;padding:6px 16px;background:var(--paper-2);border-bottom:var(--rule) solid var(--ink)}
+.rm .room-tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:thin;min-width:0}
+.rm .room-tab{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:4px 12px;border:var(--rule) solid transparent;text-decoration:none;white-space:nowrap;max-width:240px}
+.rm .room-tab .room-name{overflow:hidden;text-overflow:ellipsis}
+.rm .room-tab[aria-current=page]{border-color:var(--ink);background:var(--paper);font-weight:700}
+.rm .room-new{color:var(--ink-muted)}
+.rm .count{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;background:var(--owner);color:#fff;font:700 11px/1 var(--font-mono)}
+.rm .topbar-end{display:flex;align-items:center;gap:10px}
+.rm .connection{font-size:12px;color:var(--ink-muted);white-space:nowrap}
+.rm .connection-offline,.rm .connection-reconciling{color:var(--owner)}
+.rm .needs-button{min-height:40px;padding:4px 12px;background:var(--owner);border-color:var(--owner);color:#fff}
+.rm .needs-button .count{background:#fff;color:var(--owner)}
+.rm .gear{display:inline-grid;place-items:center;min-width:40px;min-height:40px;border:var(--rule) solid var(--ink-muted)}
+.rm .needs-panel{position:fixed;inset:56px 16px auto auto;margin:0;width:min(380px,calc(100vw - 32px));max-height:70vh;overflow:auto;padding:12px 14px;background:var(--paper);color:var(--ink);border:var(--rule) solid var(--ink);box-shadow:var(--lift) var(--lift) 0 var(--ink)}
+.rm .needs-groups,.rm .needs-items{list-style:none;margin:0;padding:0}
+.rm .needs-room{font-size:14px;margin:10px 0 4px}
+.rm .needs-items a{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 8px;padding:8px 0;border-bottom:1px dashed var(--ink-muted);text-decoration:none}
+.rm .needs-summary{overflow-wrap:anywhere}
+.rm .needs-since{grid-column:2}
+.rm .banner{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:8px 16px;background:var(--owner-bg);border-bottom:var(--rule) solid var(--owner);font-size:13px}
+.rm .banner button{margin-left:auto;min-height:40px}
+.rm .banner-alert{font-weight:700}
+.rm .room-main{padding:0}
+.rm .card{max-width:560px;margin:10vh auto;padding:28px 32px;background:var(--paper);border:var(--rule) solid var(--ink);box-shadow:5px 5px 0 var(--ink)}
+.rm .page-message{padding:48px 16px;text-align:center}
+@media (max-width:759px){
+ .rm .topbar{grid-template-columns:minmax(0,1fr) auto;gap:8px}
+ .rm .room-tabs{grid-column:1 / -1;grid-row:2}
+ .rm .connection{display:none}
+ .rm .needs-panel{inset:0;width:100vw;max-height:none;height:100dvh;box-shadow:none;border:0}
+ .rm .card{margin:24px 16px;padding:22px}
+}
