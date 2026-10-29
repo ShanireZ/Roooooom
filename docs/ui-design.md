@@ -1,6 +1,6 @@
 # Owner interface redesign
 
-Status: design approved by the owner on 2026-10-29. Implemented in 8a5fbe8; [DESIGN.md](../DESIGN.md) §11 is authoritative for shipped behavior. Protocol and authority rules in DESIGN.md are unchanged. Additive server reads, one owner preference command, and a possible forward schema migration are allowed only as described in §16.
+Status: design approved by the owner on 2026-10-29. Implemented in 8a5fbe8, with the §10 refined blueprint revision implemented in 63d85df; [DESIGN.md](../DESIGN.md) §11 is authoritative for shipped behavior. Protocol and authority rules in DESIGN.md are unchanged. Additive server reads, one owner preference command, and a possible forward schema migration are allowed only as described in §16.
 
 ## 1. Intent
 
