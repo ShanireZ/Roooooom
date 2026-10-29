@@ -1,6 +1,6 @@
 .rm .shell-bar{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:16px;padding:6px 16px;background:var(--paper-2);border-bottom:var(--rule) solid var(--ink)}
-.rm .room-tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:thin;min-width:0}
-.rm .room-tab{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:4px 12px;border:var(--rule) solid transparent;text-decoration:none;white-space:nowrap;max-width:240px}
+.rm .room-tabs{position:relative;display:flex;gap:4px;overflow-x:auto;scrollbar-width:thin;min-width:0}
+.rm .room-tab{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:4px 12px;border:var(--rule) solid transparent;text-decoration:none;white-space:nowrap;max-width:240px}
 .rm .room-tab .room-name{overflow:hidden;text-overflow:ellipsis}
 .rm .room-tab[aria-current=page]{border-color:var(--ink);background:var(--paper);font-weight:700}
 .rm .room-new{color:var(--ink-muted)}
@@ -46,3 +46,5 @@
 .rm .private-path{overflow-wrap:anywhere}
 .rm .about{display:grid;grid-template-columns:max-content 1fr;gap:4px 16px}
 .rm .about dd{margin:0;overflow-wrap:anywhere}
+.rm .needs-panel{transition:opacity .12s ease-out,translate .12s ease-out}
+@starting-style{.rm .needs-panel:popover-open{opacity:0;translate:0 -6px}}

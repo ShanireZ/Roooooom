@@ -9,6 +9,6 @@ export function Cabinet({cabinet,projectId}:{cabinet:FloorModel['cabinet'];proje
  return <a className="cabinet" href={routePath({name:'room',projectId,drawer:{kind:'archive'}})} data-local>
   <span className="label"><IconCabinet/> {t('room.cabinet')}</span>
   <strong className="cabinet-count">{tn('room.cabinetDone',cabinet.doneCount)}</strong>
-  {cabinet.recent.length?<ul className="cabinet-recent" aria-label={t('room.cabinetRecent')}>{cabinet.recent.map(r=><li key={r.taskId}>{r.goal}</li>)}</ul>:null}
+  {cabinet.recent.length?<ul className="cabinet-recent" aria-label={t('room.cabinetRecent')}>{cabinet.recent.map(r=><li key={r.taskId} title={r.goal}>{r.goal}</li>)}</ul>:null}
  </a>;
 }

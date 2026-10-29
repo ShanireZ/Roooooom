@@ -44,8 +44,8 @@
  .rm .tables,.rm .tables.compact{grid-template-columns:minmax(0,1fr)}
  .rm .door-col{border-left:0;padding-left:0;border-bottom:4px double var(--ink);padding-bottom:8px}
 }
-.rm .view-switch{display:none}
 .rm .segmented{display:flex;gap:0}
+.rm .view-switch{display:none}
 .rm .segmented>button{min-height:40px;border-radius:0}
 .rm .segmented>button+button{border-left:0}
 .rm .segmented>button[aria-pressed=true]{background:var(--ink);color:var(--on-ink)}

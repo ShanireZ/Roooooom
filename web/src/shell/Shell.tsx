@@ -30,7 +30,7 @@ export function Shell({route,retry,busy,children}:{route:Route;retry:()=>void;bu
    <Wordmark/>
    <nav className="room-tabs" aria-label={t('shell.rooms')}>
     {rooms.map(room=>{const count=needs.byProject[room.id]?.length??0;return <a key={room.id} className="room-tab" href={'/rooms/'+room.id} data-local aria-current={room.id===active?'page':undefined}>
-     <span className="room-name">{room.name}</span>{count?<><span className="count" aria-hidden="true">{count}</span><span className="sr-only">, {tn('needsYou.items',count)}</span></>:null}
+     <span className="room-name" title={room.name}>{room.name}</span>{count?<><span className="count" aria-hidden="true">{count}</span><span className="sr-only">, {tn('needsYou.items',count)}</span></>:null}
     </a>})}
     <a className="room-tab room-new" href="/rooms/new" data-local title={t('shell.newRoom')}><IconPlus/><span className="sr-only">{t('shell.newRoom')}</span></a>
    </nav>

@@ -28,3 +28,5 @@
 .rm .approve-also h3{font-size:14px;color:var(--owner)}
 .rm .inset{border-top:1px dashed var(--ink-muted);padding-top:10px;margin-top:6px}
 .rm .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.rm .drawer{transition:translate .16s ease-out,opacity .16s ease-out}
+@starting-style{.rm .drawer[open]{translate:24px 0;opacity:0}}
