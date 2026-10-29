@@ -1,4 +1,6 @@
 import {useI18n} from '../i18n/I18nProvider';
+import {AcceptanceDrawer} from '../drawer/acceptance/AcceptanceDrawer';
+import {ArchiveDrawer} from '../drawer/archive/ArchiveDrawer';
 import {DecisionDrawer} from '../drawer/decision/DecisionDrawer';
 import {RequestDrawer} from '../drawer/request/RequestDrawer';
 import {TaskDrawer} from '../drawer/task/TaskDrawer';
@@ -11,6 +13,8 @@ function drawerFor(projectId:string,drawer?:DrawerRoute){
  if(drawer?.kind==='task')return <TaskDrawer key={'task-'+drawer.id} projectId={projectId} taskId={drawer.id} tab={drawer.tab}/>;
  if(drawer?.kind==='request')return <RequestDrawer key={'request-'+drawer.id} projectId={projectId} requestId={drawer.id}/>;
  if(drawer?.kind==='decision')return <DecisionDrawer key={'decision-'+drawer.id} projectId={projectId} decisionId={drawer.id}/>;
+ if(drawer?.kind==='acceptance')return <AcceptanceDrawer key={'acceptance-'+drawer.taskId} projectId={projectId} taskId={drawer.taskId}/>;
+ if(drawer?.kind==='archive')return <ArchiveDrawer key="archive" projectId={projectId}/>;
  return undefined;
 }
 
