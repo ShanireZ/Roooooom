@@ -22,6 +22,10 @@ func EnqueueIntakeNotifications(tx *store.Tx, serviceID, generation string, id m
 	if intake.TaskID != "" {
 		return EnqueueNotifications(tx, serviceID, generation, intake.TaskID)
 	}
+	locale, e := notificationLocale(tx)
+	if e != nil {
+		return e
+	}
 	rows, e := tx.Query("SELECT id,version,body FROM decision_requests WHERE request_id=? AND state='pending' ORDER BY id", id)
 	if e != nil {
 		return e
@@ -47,13 +51,13 @@ func EnqueueIntakeNotifications(tx *store.Tx, serviceID, generation string, id m
 		if kind == "" {
 			kind = "decision-pending"
 		}
-		n, err := BuildNotification(qid, version, kind)
+		n, err := BuildNotification(qid, version, kind, locale)
 		if err != nil {
 			rows.Close()
 			return err
 		}
 		n.IntakeID = id
-		n.Text += "\n摘要：" + short(r.Question)
+		n.Summary = short(r.Question)
 		notifications = append(notifications, n)
 	}
 	e = rows.Err()

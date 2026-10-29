@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
+	"roooooom.local/roooooom/internal/i18n"
 	"roooooom.local/roooooom/internal/model"
 	"roooooom.local/roooooom/internal/outbound"
 	"roooooom.local/roooooom/internal/privatefs"
@@ -17,7 +18,7 @@ import (
 )
 
 func dingJob() outbound.Job {
-	n, _ := outbound.BuildNotification("synthetic-request", 1, "decision-pending")
+	n, _ := outbound.BuildNotification("synthetic-request", 1, "decision-pending", i18n.EN)
 	return outbound.Job{ID: "notification-job", Kind: "dingtalk.notify", Notification: &n, Binding: outbound.Binding{Kind: "dingtalk", CredentialRef: "fixture", ChannelID: outbound.BotChannel("synthetic-token")}}
 }
 func dingSecret(string) ([]byte, error) {
@@ -97,11 +98,11 @@ func TestNotificationTimeoutAndRedaction(t *testing.T) {
 	if got.State != "paused" {
 		t.Fatal("rebound to another bot")
 	}
-	n, _ := outbound.BuildNotification("q", 2, "owner-blocker")
+	n, _ := outbound.BuildNotification("q", 2, "owner-blocker", i18n.EN)
 	if n.ID == "" || strings.Contains(n.Text, "http://127.0.0.1") {
 		t.Fatal("mobile localhost promise", n)
 	}
-	if _, e = outbound.BuildNotification("q", 2, "ordinary-chat"); e == nil {
+	if _, e = outbound.BuildNotification("q", 2, "ordinary-chat", i18n.EN); e == nil {
 		t.Fatal("ordinary chat notification")
 	}
 }

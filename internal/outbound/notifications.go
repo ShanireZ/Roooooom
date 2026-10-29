@@ -3,6 +3,7 @@ package outbound
 import (
 	"encoding/json"
 	"regexp"
+	"roooooom.local/roooooom/internal/i18n"
 	"roooooom.local/roooooom/internal/model"
 	"roooooom.local/roooooom/internal/store"
 	"strconv"
@@ -17,6 +18,20 @@ type Notification struct {
 	Kind      string   `json:"kind"`
 	TaskID    model.ID `json:"taskId"`
 	Text      string   `json:"text"`
+	// Summary is appended only for bindings that opt into the summary field.
+	Summary string `json:"summary,omitempty"`
+	// Locale fixes the language at enqueue time; legacy jobs have none.
+	Locale string `json:"locale,omitempty"`
+}
+
+// notificationLocale resolves the owner language, then the host UI language.
+func notificationLocale(tx *store.Tx) (i18n.Locale, error) {
+	owner, e := tx.OwnerLanguage()
+	if e != nil {
+		return "", e
+	}
+	system, _ := i18n.OS()
+	return i18n.First(i18n.Locale(owner), system), nil
 }
 
 var links = regexp.MustCompile(`(?i)https?://[^\s]+`)
@@ -30,22 +45,23 @@ func short(s string) string {
 	}
 	return s
 }
-func BuildNotification(requestID model.ID, version int64, kind string) (Notification, error) {
-	action := ""
+func BuildNotification(requestID model.ID, version int64, kind string, locale i18n.Locale) (Notification, error) {
+	var action i18n.Key
 	switch kind {
 	case "decision-pending":
-		action = "有待你拍板的事項"
+		action = i18n.NotifyDecision
 	case "human-acceptance":
-		action = "有指定由你驗收的候選"
+		action = i18n.NotifyAcceptance
 	case "owner-blocker":
-		action = "有需要你處理的阻塞"
+		action = i18n.NotifyBlocker
 	default:
 		return Notification{}, model.Invalid("unsupported notification kind")
 	}
 	if !safeRef.MatchString(string(requestID)) || version < 1 {
 		return Notification{}, model.Invalid("request and version required")
 	}
-	return Notification{ID: digest(string(requestID) + ":" + strconv.FormatInt(version, 10) + ":" + kind), RequestID: requestID, Version: version, Kind: kind, Text: "Roooooom · " + action + "\nRequest: " + string(requestID) + " · v" + strconv.FormatInt(version, 10) + "\n請回到這台電腦的 Roooooom 決策頁處理；手機只能收提醒。"}, nil
+	locale = i18n.First(locale)
+	return Notification{ID: digest(string(requestID) + ":" + strconv.FormatInt(version, 10) + ":" + kind), RequestID: requestID, Version: version, Kind: kind, Locale: string(locale), Text: "Roooooom · " + i18n.T(locale, action) + "\nRequest: " + string(requestID) + " · v" + strconv.FormatInt(version, 10) + "\n" + i18n.T(locale, i18n.NotifyReturn)}, nil
 }
 func EnqueueNotifications(tx *store.Tx, serviceID, generation string, taskID model.ID) error {
 	var raw string
@@ -58,6 +74,10 @@ func EnqueueNotifications(tx *store.Tx, serviceID, generation string, taskID mod
 	}
 	if task.Phase == "done" || task.Phase == "cancelled" {
 		return nil
+	}
+	locale, e := notificationLocale(tx)
+	if e != nil {
+		return e
 	}
 	notifications := []Notification{}
 	rows, e := tx.Query("SELECT id,version,body FROM decision_requests WHERE (task_id=? OR request_id IN(SELECT id FROM work_requests WHERE task_id=?)) AND state='pending' ORDER BY id", taskID, taskID)
@@ -84,13 +104,13 @@ func EnqueueNotifications(tx *store.Tx, serviceID, generation string, taskID mod
 		if kind == "" {
 			kind = "decision-pending"
 		}
-		n, e := BuildNotification(id, version, kind)
+		n, e := BuildNotification(id, version, kind, locale)
 		if e != nil {
 			rows.Close()
 			return e
 		}
 		n.TaskID = taskID
-		n.Text += "\n摘要：" + short(r.Question)
+		n.Summary = short(r.Question)
 		notifications = append(notifications, n)
 	}
 	e = rows.Err()
@@ -104,7 +124,7 @@ func EnqueueNotifications(tx *store.Tx, serviceID, generation string, taskID mod
 			return e
 		}
 		if n == 0 {
-			notification, e := BuildNotification(task.CurrentCandidateID, 1, "human-acceptance")
+			notification, e := BuildNotification(task.CurrentCandidateID, 1, "human-acceptance", locale)
 			if e != nil {
 				return e
 			}
@@ -148,14 +168,14 @@ func enqueueNotificationJobs(tx *store.Tx, serviceID, generation string, taskID,
 			if !contains(b.Events, n.Kind) {
 				continue
 			}
-			if !contains(b.Fields, "summary") {
-				parts := strings.Split(n.Text, "\n摘要：")
-				n.Text = parts[0]
+			l := i18n.Locale(n.Locale)
+			if contains(b.Fields, "summary") && n.Summary != "" {
+				n.Text += "\n" + i18n.T(l, i18n.LabelSummary) + n.Summary
 			}
 			if contains(b.Fields, "goal") {
-				label := "任務："
+				label := i18n.T(l, i18n.LabelTask)
 				if intakeID != "" {
-					label = "需求："
+					label = i18n.T(l, i18n.LabelRequest)
 				}
 				n.Text += "\n" + label + short(title)
 			}
@@ -170,7 +190,7 @@ func enqueueNotificationJobs(tx *store.Tx, serviceID, generation string, taskID,
 				if e = json.Unmarshal([]byte(raw), &p); e != nil {
 					return e
 				}
-				n.Text += "\n專案：" + short(p.Name)
+				n.Text += "\n" + i18n.T(l, i18n.LabelProject) + short(p.Name)
 			}
 			if contains(b.Fields, "taskId") && taskID != "" {
 				n.Text += "\nTask: " + string(taskID)

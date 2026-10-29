@@ -14,6 +14,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"roooooom.local/roooooom/internal/i18n"
 )
 
 type DingTalk struct {
@@ -82,7 +84,12 @@ func (d *DingTalk) Deliver(ctx context.Context, j Job) (Result, error) {
 	target := d.base + "?access_token=" + url.QueryEscape(credential.Token) + "&timestamp=" + strconv.FormatInt(millis, 10) + "&sign=" + Sign(millis, credential.Secret)
 	// Text-only notification is the default fallback. No URLs, markdown links,
 	// mentions, inbound callback, or claims of mobile access to localhost.
-	text := j.Notification.Text + "\nNotificationId: " + string(j.ID) + "\n可能因網路結果未知而重複；請以本機決策頁目前狀態為準。"
+	// Jobs queued before localization carry Traditional Chinese text and no locale.
+	footer := i18n.Locale(j.Notification.Locale)
+	if footer == "" {
+		footer = i18n.ZHTW
+	}
+	text := j.Notification.Text + "\nNotificationId: " + string(j.ID) + "\n" + i18n.T(footer, i18n.NotifyFooter)
 	text = strings.ReplaceAll(strings.ReplaceAll(text, credential.Token, "[redacted]"), credential.Secret, "[redacted]")
 	payload := map[string]any{"msgtype": "text", "text": map[string]string{"content": text}, "at": map[string]any{"isAtAll": false, "atUserIds": []string{}, "atMobiles": []string{}}}
 	req, e := http.NewRequestWithContext(ctx, "POST", target, bytes.NewReader(mustBytes(payload)))

@@ -51,7 +51,7 @@ func (s *Service) readEvidence(tx readTx, a model.Actor, q model.Query) (model.V
 		if e != nil {
 			return view, e
 		}
-		view.Data = model.JSON(map[string]any{"request": request, "history": history})
+		view.Data = model.JSON(map[string]any{"request": withMessageKey(model.JSON(request)), "history": history})
 		return view, nil
 	case "delivery":
 		delivery, e := loadDelivery(tx, q.TargetID)
@@ -159,7 +159,11 @@ func (s *Service) readEvidence(tx readTx, a model.Actor, q model.Query) (model.V
 			break
 		}
 		after = id
-		result = append(result, json.RawMessage(raw))
+		if q.Kind == "decisions" {
+			result = append(result, withMessageKey(json.RawMessage(raw)))
+		} else {
+			result = append(result, json.RawMessage(raw))
+		}
 	}
 	if e = rows.Err(); e != nil {
 		return view, e

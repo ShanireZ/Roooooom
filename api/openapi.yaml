@@ -3326,6 +3326,13 @@
           },
           "specProposal": {
             "$ref": "#/components/schemas/SpecAmendment"
+          },
+          "messageKey": {
+            "type": "string",
+            "enum": [
+              "system.riskStart"
+            ],
+            "description": "Derived at read time for system-authored questions so clients can render them in the reader language; never stored or written."
           }
         },
         "required": [

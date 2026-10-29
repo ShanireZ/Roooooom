@@ -809,6 +809,11 @@ export interface components {
             requestId?: string;
             externalProposal?: components["schemas"]["ExternalAuthorization"];
             specProposal?: components["schemas"]["SpecAmendment"];
+            /**
+             * @description Derived at read time for system-authored questions so clients can render them in the reader language; never stored or written.
+             * @enum {string}
+             */
+            messageKey?: "system.riskStart";
         } & (unknown | unknown);
         DecisionView: {
             id: string;

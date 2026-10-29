@@ -552,3 +552,23 @@ func (s *Service) ensureRiskQuestion(tx *store.Tx, t *model.Task) error {
 	*t = fresh
 	return nil
 }
+
+// systemRiskScope prefixes the owner question the service raises for high-risk
+// tasks. Its stored text is in one language, so views add a stable key that
+// lets the browser render it in the owner's language.
+const systemRiskScope = "system:risk:"
+
+// withMessageKey derives messageKey for system-authored questions at read
+// time; it is never stored, so questions created before it exist get it too.
+func withMessageKey(raw json.RawMessage) json.RawMessage {
+	var fields map[string]json.RawMessage
+	if json.Unmarshal(raw, &fields) != nil {
+		return raw
+	}
+	var scope string
+	if json.Unmarshal(fields["scopeKey"], &scope) != nil || !strings.HasPrefix(scope, systemRiskScope) {
+		return raw
+	}
+	fields["messageKey"] = json.RawMessage(`"system.riskStart"`)
+	return model.JSON(fields)
+}
