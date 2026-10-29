@@ -2,6 +2,7 @@
 
 - [Project overview](../README.md) and the three linked README translations.
 - [Design and protocol](../DESIGN.md): authoritative public behavior and architecture.
+- [Owner interface redesign](ui-design.md): proposed room, drawer, visual and language design; not yet implemented.
 - [Contributing](../CONTRIBUTING.md): toolchain, checks, privacy, and change boundaries.
 - [Security](../SECURITY.md): trust model and vulnerability reporting.
 - [Verification and roadmap](testing.md): evidence classes, limits, and remaining certification work.
