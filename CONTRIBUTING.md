@@ -15,7 +15,7 @@ node scripts/check-skill-contract.mjs
 node scripts/check-publication.mjs
 ```
 
-Web must be built before Go because the server embeds generated UI files. `api/openapi.yaml` is JSON-compatible YAML; regenerate TypeScript with `npm --prefix web run api:generate` after a contract change. Check the generated file with `api:check`. The skill contract builds the current CLI and checks the same machine help; it does not prove real hosts follow the skill.
+Web must be built before Go because the server embeds generated UI files. `api/openapi.yaml` is JSON-compatible YAML; regenerate TypeScript with `npm --prefix web run api:generate` after a contract change. Check the generated file with `api:check`. The in-repo generator (`web/scripts/lib/openapi-types.mjs`) supports only the OpenAPI constructs the contract uses and fails with the JSON pointer of anything else, so a new keyword means extending it and its tests. The skill contract builds the current CLI and checks the same machine help; it does not prove real hosts follow the skill.
 
 For bundle tests, build a new directory using the packaging instructions, run `scripts/verify-bundle.mjs`, then explicitly set `ROOOOOOM_TEST_BUNDLE` to that native bundle. Run its artifact tests with `go test ./tests -run 'TestBundle|TestUpgrade|TestUnverifiedPlatform' -count=1 -v`. Without that variable these cases skip. Do not advertise them as passed.
 
