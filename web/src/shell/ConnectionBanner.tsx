@@ -6,7 +6,7 @@ import {RelativeTime} from '../ui/RelativeTime';
 export function ConnectionIndicator(){
  const {t}=useI18n(),events=useWorkspaceEvents();
  const label=events.connected?t('shell.online'):events.connection==='reconciling'?t('shell.reconciling'):t('shell.offline');
- return <span className={'connection connection-'+(events.connected?'online':events.connection)}>{label}</span>;
+ return <span className={'conn-state conn-'+(events.connected?'online':events.connection)}>{label}</span>;
 }
 // While disconnected the floor stays visible from the in-memory snapshot and writes are disabled.
 export function ConnectionBanner({retry,busy}:{retry:()=>void;busy:boolean}){

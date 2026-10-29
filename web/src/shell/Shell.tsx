@@ -26,7 +26,7 @@ export function Shell({route,retry,busy,children}:{route:Route;retry:()=>void;bu
  const needs=useNeedsYou(order);
  const active=route.name==='room'?route.projectId:undefined;
  return <div className="rm">
-  <header className="topbar">
+  <header className="shell-bar">
    <Wordmark/>
    <nav className="room-tabs" aria-label={t('shell.rooms')}>
     {rooms.map(room=>{const count=needs.byProject[room.id]?.length??0;return <a key={room.id} className="room-tab" href={'/rooms/'+room.id} data-local aria-current={room.id===active?'page':undefined}>

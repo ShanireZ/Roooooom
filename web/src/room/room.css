@@ -1,0 +1,46 @@
+.rm .room{display:grid;grid-template-columns:minmax(0,1fr);min-height:calc(100dvh - 54px)}
+.rm .room-floor{min-width:0;padding:12px 16px 32px}
+.rm .room-header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.rm .room-title{font-size:20px;margin:0}
+.rm .floor-plan{display:grid;grid-template-columns:170px minmax(0,1fr) 170px;gap:16px;padding:14px;border:var(--rule) solid var(--ink);background-color:var(--paper);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:16px 16px}
+.rm .floor-plan>div{min-width:0}
+.rm .door-col{border-left:4px double var(--ink);padding-left:10px}
+.rm .door,.rm .tables,.rm .lobby-list,.rm .cabinet-recent{list-style:none;margin:0;padding:0}
+.rm .note{display:flex;flex-direction:column;gap:2px;margin-bottom:10px;padding:8px 9px;background:var(--note);border:1px solid var(--ink);box-shadow:2px 2px 0 var(--ink);text-decoration:none;font-size:13px;overflow-wrap:anywhere}
+.rm .note-text{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-weight:600}
+.rm .tables{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px 14px}
+.rm .tables.compact{grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.rm .table-item{display:flex;flex-direction:column;gap:6px;min-width:0;transition:opacity .15s ease-out}
+.rm .table-item[data-dimmed=true]{opacity:.35}
+.rm .table{position:relative;display:flex;flex-direction:column;gap:3px;min-height:96px;padding:12px;border:var(--rule) solid var(--ink);background:var(--paper);text-decoration:none;overflow-wrap:anywhere}
+.rm .table:hover,.rm .table:focus-visible{box-shadow:var(--lift) var(--lift) 0 var(--ink)}
+.rm .table.compact{min-height:0;padding:9px}
+.rm .flagged .table{border:2px solid var(--owner)}
+.rm .flags{position:absolute;top:-11px;right:8px;display:flex;gap:4px;background:var(--paper)}
+.rm .goal{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-weight:700}
+.rm .compact .goal{-webkit-line-clamp:2;font-size:14px}
+.rm .table-add{flex-direction:row;align-items:center;justify-content:center;min-height:96px;border-style:dashed;background:transparent;color:var(--ink-muted);font-weight:600}
+.rm .seats{display:flex;flex-wrap:wrap;gap:4px}
+.rm .seat{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:2px 8px 2px 3px;background:var(--paper);color:var(--ink);border:1px solid var(--ink);font-weight:400;font-size:12px;max-width:100%}
+.rm .seat[data-stale=true]{border-style:dashed;opacity:.8}
+.rm .seat[aria-pressed=true]{box-shadow:3px 3px 0 var(--ink);font-weight:700}
+.rm .seat-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.rm .seat-role{color:var(--ink-muted)}
+.rm .seat-sync{color:var(--ink-muted);white-space:nowrap}
+.rm .avatar{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;color:var(--on-agent);font:700 10px/1 var(--font-mono);flex:0 0 auto}
+.rm .cabinet{display:flex;flex-direction:column;gap:6px;padding:10px;border:var(--rule) solid var(--ink);background:repeating-linear-gradient(0deg,var(--paper) 0 22px,var(--grid) 22px 23px);text-decoration:none}
+.rm .cabinet-count{font-size:16px}
+.rm .cabinet-recent{font-size:12px;color:var(--ink-muted)}
+.rm .cabinet-recent li{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rm .lobby{margin-top:16px}
+.rm .lobby-list{display:flex;flex-wrap:wrap;gap:6px}
+.rm .empty-floor{margin:0 0 10px}
+.rm .room-activity{min-width:0;border-left:var(--rule) solid var(--ink);background:var(--paper)}
+@media (min-width:1200px){.rm .room:has(.room-activity){grid-template-columns:minmax(0,1fr) 340px}}
+@media (max-width:759px){
+ .rm .floor-plan{grid-template-columns:minmax(0,1fr);padding:10px}
+ .rm .door{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+ .rm .door li{flex:0 0 200px}
+ .rm .tables,.rm .tables.compact{grid-template-columns:minmax(0,1fr)}
+ .rm .door-col{border-left:0;padding-left:0;border-bottom:4px double var(--ink);padding-bottom:8px}
+}
